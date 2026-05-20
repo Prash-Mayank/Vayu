@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Vayu - Modern weather forecasting application with real-time data and 5-day forecasts">
+    <meta name="theme-color" content="#5ec9c3">
+    <title>Vayu - Weather Forecasting</title>
+
+    <!-- PWA Configuration -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="logo_of_vayu.png">
+
+    <link rel="shortcut icon" href="logo_of_vayu.png" type="image/x-icon">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Space+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+</head>
+
+<body class="light-theme">
+    <div class="app-container">
+        <!-- Header Section -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <img src="logo_of_vayu.png" alt="Vayu Logo" class="logo">
+                    <h1 class="app-title">VAYU</h1>
+                </div>
+                <div class="header-actions">
+                    <button class="notification-btn" id="notificationBtn" aria-label="Toggle notifications"
+                        title="Enable/Disable Notifications">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                        </svg>
+                        <span class="notification-badge" id="notificationBadge" style="display: none;"></span>
+                    </button>
+                    <button class="share-btn" id="shareBtn" aria-label="Share weather" style="display: none;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="18" cy="5" r="3"></circle>
+                            <circle cx="6" cy="12" r="3"></circle>
+                            <circle cx="18" cy="19" r="3"></circle>
+                            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                        </svg>
+                    </button>
+                    <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                        <span class="theme-icon sun-icon">
+                            <i class="fas fa-sun"></i>
+                        </span>
+                        <span class="theme-icon moon-icon">
+                            <i class="fas fa-moon"></i>
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Greeting Section -->
+        <div class="greeting-section" id="greetingSection">
+            <h2 class="greeting-text" id="greetingText">Good Morning</h2>
+            <p class="greeting-subtitle" id="greetingSubtitle">Ready to check the weather?</p>
+        </div>
+
+        <!-- Search Section -->
+        <section class="search-section">
+            <div class="search-container">
+                <div class="search-bar">
+                    <input type="text" id="cityInput" class="city-input" placeholder="Search for a city..."
+                        autocomplete="off" aria-label="City search input">
+                    <button class="search-btn" id="searchBtn" aria-label="Search for weather">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                    </button>
+                </div>
+                <button class="location-btn" id="locationBtn" aria-label="Use current location">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                        <circle cx="12" cy="10" r="3"></circle>
+                    </svg>
+                    <span>Current Location</span>
+                </button>
+            </div>
+
+            <!-- Recent Searches & Favorites -->
+            <div class="quick-access" id="quickAccess" style="display: none;">
+                <div class="favorites-section" id="favoritesSection" style="display: none;">
+                    <h4 class="quick-access-title">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                            <path
+                                d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                        </svg>
+                        Favorites
+                    </h4>
+                    <div class="favorites-list" id="favoritesList"></div>
+                </div>
+
+                <div class="recent-section" id="recentSection" style="display: none;">
+                    <h4 class="quick-access-title">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                        Recent Searches
+                    </h4>
+                    <div class="recent-list" id="recentList"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Empty State -->
+        <div class="empty-state" id="emptyState">
+            <div class="empty-state-illustration">
+                <svg viewBox="0 0 200 200" width="200" height="200">
+                    <defs>
+                        <linearGradient id="skyGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" style="stop-color:#5ec9c3;stop-opacity:0.3" />
+                            <stop offset="100%" style="stop-color:#2c5474;stop-opacity:0.3" />
+                        </linearGradient>
+                    </defs>
+                    <circle cx="100" cy="60" r="30" fill="#FFD700" opacity="0.8" />
+                    <path d="M 30 100 Q 50 80, 70 100 T 110 100 T 150 100 T 190 100" fill="url(#skyGradient)"
+                        stroke="none" />
+                    <circle cx="60" cy="90" r="20" fill="white" opacity="0.7" />
+                    <circle cx="80" cy="85" r="25" fill="white" opacity="0.8" />
+                    <circle cx="100" cy="90" r="22" fill="white" opacity="0.7" />
+                </svg>
+            </div>
+            <h3 class="empty-state-title">Welcome to Vayu!</h3>
+            <p class="empty-state-description">Search for a city or use your current location to get started with
+                real-time weather updates.</p>
+        </div>
+
+        <!-- Loading State -->
+        <div class="loading-state" id="loadingState">
+            <div class="loading-spinner"></div>
+            <p>Fetching weather data...</p>
+        </div>
+
+        <!-- Error Message -->
+        <div class="error-message" id="errorMessage">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <p id="errorText"></p>
+        </div>
+
+        <main class="main-content" id="mainContent">
+            <section class="weather-card">
+                <div class="city-info">
+                    <div class="city-header">
+                        <h2 class="city-name" id="cityName">--</h2>
+                        <button class="favorite-toggle" id="favoriteToggle" aria-label="Add to favorites">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path
+                                    d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                            </svg>
+                        </button>
+                    </div>
+                    <p class="current-date" id="currentDate">--</p>
+                </div>
+
+                <div class="weather-primary">
+                    <div class="temperature-display">
+                        <span class="temperature" id="temperature">--</span>
+                        <span class="unit">°C</span>
+                    </div>
+                    <div class="weather-icon-container">
+                        <img src="" alt="Weather icon" class="weather-icon" id="weatherIcon">
+                    </div>
+                </div>
+
+                <div class="weather-description">
+                    <p id="weatherDescription">--</p>
+                    <p class="feels-like">Feels like <span id="feelsLike">--</span>°C</p>
+                </div>
+
+                <!-- Weather Metrics Grid -->
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>
+                            </svg>
+                        </div>
+                        <div class="metric-info">
+                            <p class="metric-label">Humidity</p>
+                            <p class="metric-value" id="humidity">--%</p>
+                        </div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path
+                                    d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2">
+                                </path>
+                            </svg>
+                        </div>
+                        <div class="metric-info">
+                            <p class="metric-label">Wind Speed</p>
+                            <p class="metric-value" id="windSpeed">-- m/s</p>
+                        </div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"></path>
+                            </svg>
+                        </div>
+                        <div class="metric-info">
+                            <p class="metric-label">Pressure</p>
+                            <p class="metric-value" id="pressure">-- hPa</p>
+                        </div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path
+                                    d="m5.8 11.7-2.1-2.1M2 18h3M8.2 17.7l1.4 1.4M22 18h-3M7.8 6.3 6.4 4.9M12 2v3M17.6 4.9l-1.4 1.4M21.7 11.7l-2.1 2.1">
+                                </path>
+                                <circle cx="12" cy="18" r="3"></circle>
+                            </svg>
+                        </div>
+                        <div class="metric-info">
+                            <p class="metric-label">Wind Direction</p>
+                            <p class="metric-value" id="windDirection">--</p>
+                        </div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="22" y1="12" x2="18" y2="12"></line>
+                                <line x1="6" y1="12" x2="2" y2="12"></line>
+                                <line x1="12" y1="6" x2="12" y2="2"></line>
+                                <line x1="12" y1="22" x2="12" y2="18"></line>
+                                <circle cx="12" cy="12" r="4"></circle>
+                            </svg>
+                        </div>
+                        <div class="metric-info">
+                            <p class="metric-label">Visibility</p>
+                            <p class="metric-value" id="visibility">-- km</p>
+                        </div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path
+                                    d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83">
+                                </path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                        </div>
+                        <div class="metric-info">
+                            <p class="metric-label">Sunrise</p>
+                            <p class="metric-value" id="sunrise">--:--</p>
+                        </div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M17 18a5 5 0 0 0-10 0"></path>
+                                <line x1="12" y1="2" x2="12" y2="9"></line>
+                                <line x1="4.22" y1="10.22" x2="5.64" y2="11.64"></line>
+                                <line x1="1" y1="18" x2="3" y2="18"></line>
+                                <line x1="21" y1="18" x2="23" y2="18"></line>
+                                <line x1="18.36" y1="11.64" x2="19.78" y2="10.22"></line>
+                                <line x1="23" y1="22" x2="1" y2="22"></line>
+                                <polyline points="8 6 12 2 16 6"></polyline>
+                            </svg>
+                        </div>
+                        <div class="metric-info">
+                            <p class="metric-label">Sunset</p>
+                            <p class="metric-value" id="sunset">--:--</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Air Quality Section -->
+                <div class="air-quality-section" id="airQualitySection">
+                    <h3 class="aqi-title">Air Quality Index</h3>
+                    <div class="aqi-card">
+                        <div class="aqi-main">
+                            <div class="aqi-value-container">
+                                <div class="aqi-value" id="aqiValue">--</div>
+                                <div class="aqi-label" id="aqiLabel">Loading...</div>
+                            </div>
+                        </div>
+                        <div class="aqi-components">
+                            <div class="aqi-component">
+                                <span class="component-label">PM2.5</span>
+                                <span class="component-value" id="pm25">--</span>
+                            </div>
+                            <div class="aqi-component">
+                                <span class="component-label">PM10</span>
+                                <span class="component-value" id="pm10">--</span>
+                            </div>
+                            <div class="aqi-component">
+                                <span class="component-label">O₃</span>
+                                <span class="component-value" id="o3">--</span>
+                            </div>
+                            <div class="aqi-component">
+                                <span class="component-label">NO₂</span>
+                                <span class="component-value" id="no2">--</span>
+                            </div>
+                            <div class="aqi-component">
+                                <span class="component-label">SO₂</span>
+                                <span class="component-value" id="so2">--</span>
+                            </div>
+                            <div class="aqi-component">
+                                <span class="component-label">CO</span>
+                                <span class="component-value" id="co">--</span>
+                            </div>
+                        </div>
+                        <div class="aqi-description" id="aqiDescription">
+                            Air quality information will be displayed here
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Hourly Forecast Section -->
+            <section class="hourly-forecast-section" id="hourlyForecastSection" style="display: none;">
+                <div class="forecast-header">
+                    <h3 class="forecast-title">24-Hour Forecast</h3>
+                    <button class="forecast-toggle" id="forecastToggle"
+                        aria-label="Toggle between hourly and daily forecast">
+                        <span class="toggle-label active" data-view="hourly">Hourly</span>
+                        <span class="toggle-indicator"></span>
+                        <span class="toggle-label" data-view="daily">5-Day</span>
+                    </button>
+                </div>
+                <div class="hourly-scroll-wrapper">
+                    <button class="scroll-btn scroll-left" id="scrollLeft" aria-label="Scroll left">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
+                    </button>
+                    <div class="hourly-scroll-container" id="hourlyScrollContainer">
+                        <div class="hourly-forecast-grid" id="hourlyForecastGrid">
+                            <!-- Hourly forecast cards will be dynamically inserted here -->
+                        </div>
+                    </div>
+                    <button class="scroll-btn scroll-right" id="scrollRight" aria-label="Scroll right">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Forecast Section -->
+            <section class="forecast-section" id="dailyForecastSection">
+                <div class="forecast-header">
+                    <h3 class="forecast-title">5-Day Forecast</h3>
+                    <button class="forecast-toggle" id="forecastToggle2"
+                        aria-label="Toggle between hourly and daily forecast">
+                        <span class="toggle-label" data-view="hourly">Hourly</span>
+                        <span class="toggle-indicator"></span>
+                        <span class="toggle-label active" data-view="daily">5-Day</span>
+                    </button>
+                </div>
+                <div class="forecast-grid" id="forecastGrid">
+                    <!-- Forecast cards will be dynamically inserted here -->
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Developed by <span class="developer-name">Mayank Prashar</span></p>
+        </footer>
+    </div>
+
+    <!-- Install PWA prompt -->
+    <div class="pwa-install-prompt" id="pwaPrompt" style="display: none;">
+        <div class="pwa-prompt-content">
+            <img src="logo_of_vayu.png" alt="Vayu" class="pwa-icon">
+            <div class="pwa-text">
+                <h4>Install Vayu</h4>
+                <p>Get quick access to weather updates</p>
+            </div>
+            <button class="pwa-install-btn" id="pwaInstallBtn">Install</button>
+            <button class="pwa-dismiss-btn" id="pwaDismissBtn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,85 @@
+{
+  "name": "Vayu — Weather, Reimagined",
+  "short_name": "Vayu",
+  "description": "Real-time weather at your fingertips. Hourly forecasts, air quality, 5-day outlooks — beautifully presented by Vayu.",
+  "start_url": "/",
+  "scope": "/",
+  "id": "vayu-weather-app",
+  "lang": "en-IN",
+  "dir": "ltr",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui", "browser"],
+  "background_color": "#ffffff",
+  "theme_color": "#5ec9c3",
+  "orientation": "any",
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "logo_of_vayu.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "logo_of_vayu.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "logo_of_vayu.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "logo_of_vayu.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "categories": ["weather", "utilities", "lifestyle"],
+  "iarc_rating_id": "",
+  "related_applications": [],
+  "shortcuts": [
+    {
+      "name": "My Location Weather",
+      "short_name": "My Location",
+      "description": "Instantly see weather for where you are right now",
+      "url": "/?location=true",
+      "icons": [
+        {
+          "src": "logo_of_vayu.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "logo_of_vayu.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Vayu Weather — Home Screen"
+    },
+    {
+      "src": "logo_of_vayu.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Vayu Weather — Desktop View"
+    }
+  ],
+  "share_target": {
+    "action": "/",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "city",
+      "url": "url"
+    }
+  }
+}
