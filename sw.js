@@ -1,4 +1,4 @@
-const SHELL_CACHE = 'vayu-shell-v1';
+const SHELL_CACHE = 'vayu-shell-v3';
 const API_CACHE = 'vayu-api-v1';
 
 const SHELL_ASSETS = [

@@ -1,8 +1,7 @@
-
 const CONFIG = {
-  OWM_KEY: '',        // openweathermap.org/api
-  IQAIR_KEY: '',       // iqair.com/air-pollution-data-api
-  UNSPLASH_KEY: '',    // unsplash.com/developers
+  OWM_KEY: "ce9002563999a6063681426c8e9822c1",
+  IQAIR_KEY: 'a543a3f4-5b5f-47f8-b4c0-f70f6fd05306',   
+  UNSPLASH_KEY: '0jMJrCpg4anHP503XZVsWERAHWinavrh83UpEYL5EnQ',  
 };
 
 const state = {
@@ -455,7 +454,10 @@ async function loadCity(lat, lon, name, country){
           co:(c.carbon_monoxide/1000).toFixed(1) };
       }catch(e){ console.warn('AQI unavailable', e); }
     }
-    if(myToken === loadToken) renderAQI();
+    if(myToken === loadToken){
+      renderAQI();
+      if(window.VAYU && window.VAYU.updateCharts) window.VAYU.updateCharts(state);
+    }
   })();
 
   // [4] Astronomy — non-blocking
@@ -567,6 +569,12 @@ function switchView(view){
   qsa('.bn-btn[data-view]').forEach(b => b.classList.toggle('active', b.dataset.view === view));
   closeDrawer(); closeSheet();
   window.scrollTo({ top:0, behavior:'smooth' });
+  // Chart.js measures canvases at creation time; a chart built while its
+  // tab was display:none gets stuck at 0x0. Re-run charts for the tab
+  // that just became visible so it picks up real dimensions.
+  if(window.VAYU && window.VAYU.updateCharts){
+    requestAnimationFrame(() => window.VAYU.updateCharts(state));
+  }
 }
 
 /* -----------------------------------------------------------
