@@ -99,7 +99,7 @@
                 </div>
                 <div class="row-toggle">
                     <span><i class="fa-solid fa-sun"></i> Light</span>
-                    <button class="switch" id="themeSwitch" role="switch" aria-checked="true"
+                    <button class="switch theme-switch" id="themeSwitch" role="switch" aria-checked="true"
                         aria-label="Toggle dark mode">
                         <span class="switch-thumb"></span>
                     </button>
@@ -141,7 +141,7 @@
             </ul>
             <div class="row-toggle">
                 <span><i class="fa-solid fa-sun"></i></span>
-                <button class="switch" id="themeSwitchMobile" role="switch" aria-checked="true"
+                <button class="switch theme-switch" id="themeSwitchMobile" role="switch" aria-checked="true"
                     aria-label="Toggle dark mode">
                     <span class="switch-thumb"></span>
                 </button>
@@ -162,15 +162,18 @@
                 </label>
                 <div id="searchSuggestions" class="suggestions" hidden></div>
                 <button class="btn-outline" id="compareToggleBtn"><i class="fa-solid fa-scale-balanced"></i><span
-                        class="only-desktop">&nbsp;Compare</span></button>
+                        class="compare-label">&nbsp;Compare</span></button>
             </div>
 
             <!-- ===== DASHBOARD VIEW ===== -->
             <section class="view active" id="view-dashboard">
 
                 <div class="grid-top">
-                    <article class="card hero-card" id="heroCard"
-                        style="--bg-photo:url('https://images.unsplash.com/photo-1587474260584-136574528ed5?auto=format&fit=crop&w=1400&q=60')">
+                    <article class="card hero-card" id="heroCard">
+                        <div class="hero-bg is-active" id="heroBgA"
+                            style="background-image:linear-gradient(180deg, rgba(7,13,24,0.35), rgba(7,13,24,0.85)), url('https://images.unsplash.com/photo-1587474260584-136574528ed5?auto=format&fit=crop&w=1400&q=60')">
+                        </div>
+                        <div class="hero-bg" id="heroBgB"></div>
                         <div class="hero-overlay">
                             <div class="hero-top">
                                 <div>
@@ -269,7 +272,7 @@
                     <p class="advisory"><i class="fa-solid fa-circle-info"></i> <span id="healthAdvisory">Air quality
                             data will appear once a city is loaded.</span></p>
                     <p class="no-key-note" id="iqairKeyNote" hidden><i class="fa-solid fa-key"></i> Add your IQAir API
-                        key in <code>script.js</code> to see live pollutant data — see README.</p>
+                        key in <code>config.js</code> to see live pollutant data — see README.</p>
                 </article>
 
                 <article class="card">
@@ -500,7 +503,7 @@
                         <div><strong>Theme</strong>
                             <p class="muted">Switch between light and dark mode.</p>
                         </div>
-                        <button class="switch" id="themeSwitchSettings" role="switch" aria-checked="true"
+                        <button class="switch theme-switch" id="themeSwitchSettings" role="switch" aria-checked="true"
                             aria-label="Toggle dark mode"><span class="switch-thumb"></span></button>
                     </div>
 
@@ -517,15 +520,6 @@
                             <p class="muted">Add Vayu to your home screen for offline access.</p>
                         </div>
                         <button class="btn-outline" id="installBtn" disabled>Install</button>
-                    </div>
-
-                    <div class="settings-row">
-                        <div><strong>API Keys</strong>
-                            <p class="muted">OpenWeatherMap, IQAir &amp; Unsplash keys are configured in
-                                <code>script.js</code>.
-                            </p>
-                        </div>
-                        <span class="pill" id="keyStatusPill">Check status</span>
                     </div>
                 </article>
             </section>
@@ -563,6 +557,8 @@
 
     <div class="toast" id="toast"></div>
 
+    <!-- Local API keys (gitignored) — must load before script.js -->
+    <script src="config.js"></script>
     <script src="script.js"></script>
     <script src="charts.js"></script>
 </body>

@@ -1,7 +1,36 @@
-const CONFIG = {
-  OWM_KEY: "ce9002563999a6063681426c8e9822c1",
-  IQAIR_KEY: 'a543a3f4-5b5f-47f8-b4c0-f70f6fd05306',   
-  UNSPLASH_KEY: '0jMJrCpg4anHP503XZVsWERAHWinavrh83UpEYL5EnQ',  
+// API keys now live in config.js (gitignored — see config.example.js for the
+// template). config.js must be loaded via a <script> tag BEFORE this file.
+// We never hardcode real keys here so this file is safe to commit publicly.
+if (!window.VAYU_CONFIG) {
+  console.warn(
+    '[Vayu] config.js not found or loaded after script.js. ' +
+    'Copy config.example.js to config.js and add your API keys. ' +
+    'The app will still run on the no-key fallbacks (Open-Meteo).'
+  );
+}
+const CONFIG = window.VAYU_CONFIG || { OWM_KEY: '', IQAIR_KEY: '', UNSPLASH_KEY: '' };
+
+const ENDPOINTS = {
+  GEOCODE: 'https://geocoding-api.open-meteo.com/v1/search',
+  OWM_CURRENT: 'https://api.openweathermap.org/data/2.5/weather',
+  OWM_FORECAST: 'https://api.openweathermap.org/data/2.5/forecast',
+  OPEN_METEO: 'https://api.open-meteo.com/v1/forecast',
+  IQAIR: 'https://api.airvisual.com/v2/nearest_city',
+  OPEN_METEO_AQI: 'https://air-quality-api.open-meteo.com/v1/air-quality',
+  SUNRISE_SUNSET: 'https://api.sunrise-sunset.org/json',
+  UNSPLASH_SEARCH: 'https://api.unsplash.com/search/photos',
+  BIGDATACLOUD_REVERSE: 'https://api.bigdatacloud.net/data/reverse-geocode-client',
+  EONET: 'https://eonet.gsfc.nasa.gov/api/v3/events',
+};
+
+const LIMITS = {
+  MAX_FAVORITES: 5,
+  MAX_RECENT: 7,
+  SEARCH_DEBOUNCE_MS: 800,
+  PHOTO_CACHE_MS: 24 * 60 * 60 * 1000,
+  ALERT_RADIUS_KM: 500,
+  EVENT_RADIUS_KM: 1500,
+  EVENT_LIMIT: 12,
 };
 
 const state = {
@@ -21,6 +50,16 @@ const state = {
 
 const $ = (id) => document.getElementById(id);
 const qsa = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+
+function escapeHtml(str){
+  if(str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
 
 /* -----------------------------------------------------------
    3. WMO weather code → { icon, label } (used by Open-Meteo)
@@ -55,7 +94,7 @@ async function fetchJSON(url, opts){
 
 // Geocoding (no key) — used for the search box
 async function geocodeCity(name){
-  const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(name)}&count=6&language=en&format=json`;
+  const url = `${ENDPOINTS.GEOCODE}?name=${encodeURIComponent(name)}&count=6&language=en&format=json`;
   const data = await fetchJSON(url);
   return (data.results || []).map(r => ({
     name: r.name, country: r.country_code, admin1: r.admin1,
@@ -66,14 +105,14 @@ async function geocodeCity(name){
 // PRIMARY: OpenWeatherMap current + forecast (needs OWM_KEY)
 async function fetchOWM(lat, lon){
   if(!CONFIG.OWM_KEY) throw new Error('No OWM key configured');
-  const cur = await fetchJSON(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${CONFIG.OWM_KEY}`);
-  const fc = await fetchJSON(`https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=metric&appid=${CONFIG.OWM_KEY}`);
+  const cur = await fetchJSON(`${ENDPOINTS.OWM_CURRENT}?lat=${lat}&lon=${lon}&units=metric&appid=${CONFIG.OWM_KEY}`);
+  const fc = await fetchJSON(`${ENDPOINTS.OWM_FORECAST}?lat=${lat}&lon=${lon}&units=metric&appid=${CONFIG.OWM_KEY}`);
   return { source:'owm', current: cur, forecast: fc };
 }
 
 // BACKUP: Open-Meteo (no key) — also used as primary when OWM key is absent
 async function fetchOpenMeteo(lat, lon){
-  const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
+  const url = `${ENDPOINTS.OPEN_METEO}?latitude=${lat}&longitude=${lon}` +
     `&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,surface_pressure,visibility` +
     `&hourly=temperature_2m,precipitation_probability,weather_code,wind_speed_10m,uv_index` +
     `&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,uv_index_max` +
@@ -85,34 +124,77 @@ async function fetchOpenMeteo(lat, lon){
 // IQAir AQI (needs IQAIR_KEY)
 async function fetchIQAir(lat, lon){
   if(!CONFIG.IQAIR_KEY) throw new Error('No IQAir key configured');
-  return fetchJSON(`https://api.airvisual.com/v2/nearest_city?lat=${lat}&lon=${lon}&key=${CONFIG.IQAIR_KEY}`);
+  return fetchJSON(`${ENDPOINTS.IQAIR}?lat=${lat}&lon=${lon}&key=${CONFIG.IQAIR_KEY}`);
 }
 
 // Fallback AQI via Open-Meteo Air Quality API (no key) so the panel
 // still shows real numbers if an IQAir key hasn't been added yet.
 async function fetchOpenMeteoAQI(lat, lon){
-  const url = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}` +
+  const url = `${ENDPOINTS.OPEN_METEO_AQI}?latitude=${lat}&longitude=${lon}` +
     `&current=us_aqi,pm2_5,pm10,ozone,nitrogen_dioxide,sulphur_dioxide,carbon_monoxide`;
   return fetchJSON(url);
 }
 
 // Sunrise-Sunset.org (no key)
 async function fetchSunriseSunset(lat, lon){
-  const url = `https://api.sunrise-sunset.org/json?lat=${lat}&lng=${lon}&formatted=0`;
+  const url = `${ENDPOINTS.SUNRISE_SUNSET}?lat=${lat}&lng=${lon}&formatted=0`;
   const data = await fetchJSON(url);
   return data.results;
 }
 
 // Unsplash background (needs UNSPLASH_KEY)
-async function fetchUnsplash(city, condition){
+async function fetchUnsplash(city, condition, country){
   if(!CONFIG.UNSPLASH_KEY) throw new Error('No Unsplash key configured');
-  const cacheKey = `vayuPhoto:${city.toLowerCase()}`;
+  // Include country in the cache key — "Paris, FR" and "Paris, US" (Texas)
+  // are different cities and shouldn't share a cached photo.
+  const cacheKey = `vayuPhoto:${city.toLowerCase()}:${(country || '').toLowerCase()}`;
   const cached = JSON.parse(localStorage.getItem(cacheKey) || 'null');
-  if(cached && Date.now() - cached.ts < 24*60*60*1000) return cached;
-  const url = `https://api.unsplash.com/search/photos?query=${encodeURIComponent(city + ' ' + condition + ' skyline')}&per_page=1&orientation=landscape&client_id=${CONFIG.UNSPLASH_KEY}`;
-  const data = await fetchJSON(url);
-  const photo = data.results && data.results[0];
-  if(!photo) throw new Error('No Unsplash result');
+  if(cached && Date.now() - cached.ts < LIMITS.PHOTO_CACHE_MS) return cached;
+
+  const queries = [
+    `${city} ${condition} skyline`,
+    `${city} skyline`,
+    `${city} city`,
+    country ? `${country} city` : null,
+  ].filter(Boolean);
+
+  let photo = null;
+  let lastErr = null;
+  for(const q of queries){
+    try{
+      const url = `${ENDPOINTS.UNSPLASH_SEARCH}?query=${encodeURIComponent(q)}&per_page=1&orientation=landscape&client_id=${CONFIG.UNSPLASH_KEY}`;
+      const res = await fetch(url);
+      // 401 = bad/missing access key, 403 = rate limit (50 req/hr on the
+      // free tier) — both apply to every query this call would try, so
+      // stop immediately instead of burning the rest of the hourly quota.
+      if(res.status === 401){
+        lastErr = new Error('Unsplash 401 Unauthorized — check UNSPLASH_KEY in config.js');
+        console.error(`[Vayu/Unsplash] "${city}":`, lastErr.message);
+        break;
+      }
+      if(res.status === 403){
+        lastErr = new Error('Unsplash 403 — likely the 50 req/hour free-tier rate limit. Wait an hour or cache more aggressively.');
+        console.error(`[Vayu/Unsplash] "${city}":`, lastErr.message);
+        break;
+      }
+      if(!res.ok){
+        lastErr = new Error(`Unsplash HTTP ${res.status} for query "${q}"`);
+        console.warn(`[Vayu/Unsplash] "${city}":`, lastErr.message);
+        continue;
+      }
+      const data = await res.json();
+      photo = data.results && data.results[0];
+      if(photo){ console.info(`[Vayu/Unsplash] "${city}" ✓ matched on query "${q}"`); break; }
+      console.warn(`[Vayu/Unsplash] "${city}": no results for query "${q}", trying next fallback…`);
+    }catch(e){
+      lastErr = e;
+      console.warn(`[Vayu/Unsplash] "${city}": network error on query "${q}"`, e);
+    }
+  }
+  if(!photo){
+    throw lastErr || new Error(`No Unsplash result for "${city}" across all fallback queries`);
+  }
+
   const result = {
     ts: Date.now(),
     url: photo.urls.regular,
@@ -124,11 +206,33 @@ async function fetchUnsplash(city, condition){
   return result;
 }
 
+// Manual QA helper — run window.VAYU.testUnsplash() in the browser console
+// to batch-check a spread of city names/types and see exactly which ones
+// succeed, get rate-limited, or come back empty. Logs a summary table.
+async function testUnsplashForCities(cities){
+  cities = cities || [
+    'New Delhi', 'Tokyo', 'Paris', 'New York', 'Cairo', 'Reykjavik',
+    'Dharamshala', 'São Paulo', 'Wellington', 'Ulaanbaatar',
+  ];
+  const rows = [];
+  for(const city of cities){
+    const start = performance.now();
+    try{
+      const photo = await fetchUnsplash(city, 'clear sky', '');
+      rows.push({ city, status: 'OK', ms: Math.round(performance.now()-start), url: photo.url });
+    }catch(e){
+      rows.push({ city, status: 'FAILED', ms: Math.round(performance.now()-start), error: e.message });
+    }
+  }
+  console.table(rows);
+  return rows;
+}
+
 // NASA EONET — once per session, cached in sessionStorage
 async function fetchEonet(){
   const cached = sessionStorage.getItem('vayuEonet');
   if(cached) return JSON.parse(cached);
-  const data = await fetchJSON('https://eonet.gsfc.nasa.gov/api/v3/events?status=open&limit=60');
+  const data = await fetchJSON(`${ENDPOINTS.EONET}?status=open&limit=60`);
   sessionStorage.setItem('vayuEonet', JSON.stringify(data.events || []));
   return data.events || [];
 }
@@ -377,8 +481,8 @@ function renderEvents(){
   list.innerHTML = state.events.map(e => `
     <li class="event-row">
       <span class="event-type"><i class="fa-solid ${eonetIcon(e.categories[0]?.id)}"></i></span>
-      <span class="event-info"><strong>${e.title}</strong><small>${e.categories[0]?.title || 'Event'} · ${Math.round(e.distance)} km away</small></span>
-      <a class="btn-link" href="${e.sources[0]?.url || '#'}" target="_blank" rel="noopener">Source <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+      <span class="event-info"><strong>${escapeHtml(e.title)}</strong><small>${escapeHtml(e.categories[0]?.title || 'Event')} · ${Math.round(e.distance)} km away</small></span>
+      <a class="btn-link" href="${escapeHtml(e.sources[0]?.url || '#')}" target="_blank" rel="noopener">Source <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
     </li>`).join('');
 }
 function eonetIcon(catId){
@@ -387,12 +491,12 @@ function eonetIcon(catId){
 }
 
 function renderAlertBanner(){
-  const nearby = state.events.find(e => e.distance <= 500);
+  const nearby = state.events.find(e => e.distance <= LIMITS.ALERT_RADIUS_KM);
   if(nearby){
     $('alertCard').hidden = false;
     $('noAlertCard').style.display = 'none';
     $('alertTitle').textContent = nearby.title;
-    $('alertMessage').textContent = `${nearby.categories[0]?.title || 'Active event'} reported within 500km of your location.`;
+    $('alertMessage').textContent = `${nearby.categories[0]?.title || 'Active event'} reported within ${LIMITS.ALERT_RADIUS_KM}km of your location.`;
     $('alertSource').textContent = 'NASA EONET';
     $('alertDetailsBtn').onclick = () => switchView('alerts');
   } else {
@@ -401,16 +505,36 @@ function renderAlertBanner(){
   }
 }
 
+// Crossfades the hero photo by alternating between two stacked layers
+// (heroBgA / heroBgB) instead of swapping background-image directly —
+// background-image changes can't be CSS-transitioned, so we fade opacity
+// between two pre-set layers instead. See style.css .hero-bg / .is-active.
+let heroActiveLayer = 'A';
+function setHeroBackground(bgImageCss){
+  const a = $('heroBgA'), b = $('heroBgB');
+  if(!a || !b) return;
+  const showEl = heroActiveLayer === 'A' ? b : a;
+  const hideEl = heroActiveLayer === 'A' ? a : b;
+  showEl.style.backgroundImage = bgImageCss;
+  // Set on next frame so the browser registers the starting (opacity:0)
+  // state before we flip it — otherwise the fade can be skipped.
+  requestAnimationFrame(() => {
+    showEl.classList.add('is-active');
+    hideEl.classList.remove('is-active');
+  });
+  heroActiveLayer = heroActiveLayer === 'A' ? 'B' : 'A';
+}
+
 function renderHeroBackground(photo){
-  const hero = $('heroCard');
+  const overlay = 'linear-gradient(180deg, rgba(7,13,24,0.35), rgba(7,13,24,0.85))';
   if(photo && photo.url){
-    hero.style.setProperty('--bg-photo', `url('${photo.url}')`);
+    setHeroBackground(`${overlay}, url('${photo.url}')`);
     $('photoCredit').hidden = false;
     $('photoCreditLink').textContent = photo.photographer;
     $('photoCreditLink').href = photo.link;
   } else {
     // gradient fallback, themed loosely by condition
-    hero.style.setProperty('--bg-photo', 'linear-gradient(160deg,#0c2540,#0a1322)');
+    setHeroBackground(`${overlay}, linear-gradient(160deg,#0c2540,#0a1322)`);
     $('photoCredit').hidden = true;
   }
 }
@@ -471,7 +595,7 @@ async function loadCity(lat, lon, name, country){
   // [5] Unsplash background — non-blocking
   (async () => {
     try{
-      const photo = await fetchUnsplash(name, state.weather.current.condition);
+      const photo = await fetchUnsplash(name, state.weather.current.condition, country);
       if(myToken === loadToken) renderHeroBackground(photo);
     }catch(_){ if(myToken === loadToken) renderHeroBackground(null); }
   })();
@@ -486,9 +610,9 @@ async function loadCity(lat, lon, name, country){
           const [elon, elat] = geo.coordinates.length === 2 ? geo.coordinates : geo.coordinates[0][0];
           return { ...e, distance: haversine(lat, lon, elat, elon) };
         })
-        .filter(e => e.distance <= 1500)
+        .filter(e => e.distance <= LIMITS.EVENT_RADIUS_KM)
         .sort((a,b) => a.distance - b.distance)
-        .slice(0, 12);
+        .slice(0, LIMITS.EVENT_LIMIT);
       state.events = near;
       if(myToken === loadToken){ renderEvents(); renderAlertBanner(); }
     }catch(e){ console.warn('EONET unavailable', e); }
@@ -505,7 +629,7 @@ function saveRecent(name, country, lat, lon){
   let list = JSON.parse(localStorage.getItem('vayuRecentSearches') || '[]');
   list = list.filter(c => c.name !== name);
   list.unshift({ name, country, lat, lon });
-  list = list.slice(0, 7);
+  list = list.slice(0, LIMITS.MAX_RECENT);
   localStorage.setItem('vayuRecentSearches', JSON.stringify(list));
   renderRecent();
 }
@@ -524,7 +648,7 @@ function toggleFavorite(){
     list = list.filter(c => c.name !== state.city);
     toast('Removed from favourites');
   } else {
-    if(list.length >= 5){ toast('You can save up to 5 favourites'); return; }
+    if(list.length >= LIMITS.MAX_FAVORITES){ toast(`You can save up to ${LIMITS.MAX_FAVORITES} favourites`); return; }
     list.push({ name:state.city, country:state.country, lat:state.lat, lon:state.lon });
     toast('Added to favourites');
   }
@@ -540,9 +664,9 @@ function renderFavorites(){
   bindCityRows(el);
 }
 function cityRow(c){
-  return `<li class="city-row" data-lat="${c.lat}" data-lon="${c.lon}" data-name="${c.name}" data-country="${c.country||''}" tabindex="0">
+  return `<li class="city-row" data-lat="${c.lat}" data-lon="${c.lon}" data-name="${escapeHtml(c.name)}" data-country="${escapeHtml(c.country||'')}" tabindex="0">
     <i class="fa-solid fa-location-dot"></i>
-    <span class="city-row-name">${c.name}<small>${c.country||''}</small></span>
+    <span class="city-row-name">${escapeHtml(c.name)}<small>${escapeHtml(c.country||'')}</small></span>
     <i class="fa-solid fa-chevron-right muted"></i>
   </li>`;
 }
@@ -569,10 +693,12 @@ function switchView(view){
   qsa('.bn-btn[data-view]').forEach(b => b.classList.toggle('active', b.dataset.view === view));
   closeDrawer(); closeSheet();
   window.scrollTo({ top:0, behavior:'smooth' });
-  // Chart.js measures canvases at creation time; a chart built while its
-  // tab was display:none gets stuck at 0x0. Re-run charts for the tab
-  // that just became visible so it picks up real dimensions.
-  if(window.VAYU && window.VAYU.updateCharts){
+  // Chart.js measures canvases at creation time, so a chart built while its
+  // tab was display:none gets stuck at 0x0. Only the dashboard (temp/precip/
+  // wind) and air-quality (AQI trend) tabs hold canvases, so only rebuild
+  // when entering one of those — avoids a pointless re-animate on every
+  // unrelated nav click (Settings, Favourites, etc).
+  if((view === 'dashboard' || view === 'airquality') && window.VAYU && window.VAYU.updateCharts){
     requestAnimationFrame(() => window.VAYU.updateCharts(state));
   }
 }
@@ -591,14 +717,14 @@ function bindSearch(input, onPick){
         const results = await geocodeCity(q);
         showSuggestions(results, onPick, input);
       }catch(e){ console.warn('Geocode failed', e); }
-    }, 800);
+    }, LIMITS.SEARCH_DEBOUNCE_MS);
   });
 }
 function showSuggestions(results, onPick, input){
   const box = $('searchSuggestions');
   if(!box) return;
   if(!results.length){ box.hidden = true; return; }
-  box.innerHTML = results.map((r,i) => `<button data-i="${i}"><i class="fa-solid fa-location-dot"></i> ${r.name}${r.admin1 ? ', '+r.admin1 : ''}, ${r.country}</button>`).join('');
+  box.innerHTML = results.map((r,i) => `<button data-i="${i}"><i class="fa-solid fa-location-dot"></i> ${escapeHtml(r.name)}${r.admin1 ? ', '+escapeHtml(r.admin1) : ''}, ${escapeHtml(r.country)}</button>`).join('');
   box.hidden = false;
   qsa('button', box).forEach((btn,i) => {
     btn.addEventListener('click', () => {
@@ -639,7 +765,7 @@ function compareCardHTML(c, other){
     ['Humidity', c.humidity + '%', other ? c.humidity < other.humidity : null],
     ['Wind', c.wind + ' km/h', other ? c.wind < other.wind : null],
   ];
-  return `<strong>${c.name}, ${c.country}</strong>` + rows.map(([label, val, better]) =>
+  return `<strong>${escapeHtml(c.name)}, ${escapeHtml(c.country)}</strong>` + rows.map(([label, val, better]) =>
     `<div class="compare-stat"><span>${label}</span><span class="${better===true?'better':better===false?'worse':''}">${val}</span></div>`
   ).join('');
 }
@@ -663,7 +789,7 @@ function closeSheet(){ $('moreSheet').classList.remove('open'); $('sheetOverlay'
 function applyTheme(){
   document.body.dataset.theme = state.theme;
   localStorage.setItem('vayuTheme', state.theme);
-  qsa('.switch').forEach(s => s.setAttribute('aria-checked', state.theme === 'dark'));
+  qsa('.theme-switch').forEach(s => s.setAttribute('aria-checked', state.theme === 'dark'));
 }
 function toggleTheme(){
   state.theme = state.theme === 'dark' ? 'light' : 'dark';
@@ -683,7 +809,6 @@ function setUnit(u){ state.unit = u; applyUnit(); }
 function init(){
   applyTheme();
   applyUnit();
-  updateKeyStatusPill();
 
   // Nav (sidebar + drawer + sheet + bottom nav)
   qsa('[data-view]').forEach(btn => btn.addEventListener('click', () => switchView(btn.dataset.view)));
@@ -694,7 +819,7 @@ function init(){
   $('moreBtn').addEventListener('click', openSheet);
   $('sheetOverlay').addEventListener('click', closeSheet);
 
-  qsa('.switch').forEach(s => s.addEventListener('click', toggleTheme));
+  qsa('.theme-switch').forEach(s => s.addEventListener('click', toggleTheme));
   $('themeToggleTop').addEventListener('click', toggleTheme);
   qsa('.seg-btn').forEach(b => b.addEventListener('click', () => setUnit(b.dataset.unit)));
 
@@ -744,13 +869,6 @@ function init(){
   }
 }
 
-function updateKeyStatusPill(){
-  const total = 3, set = [CONFIG.OWM_KEY, CONFIG.IQAIR_KEY, CONFIG.UNSPLASH_KEY].filter(Boolean).length;
-  const pill = $('keyStatusPill');
-  pill.textContent = `${set} / ${total} keys added`;
-  pill.className = 'pill ' + (set === total ? 'good' : set === 0 ? 'unhealthy' : 'moderate');
-}
-
 function useMyLocation(){
   if(!navigator.geolocation){ toast('Geolocation not supported on this device'); return; }
   toast('Locating you…');
@@ -758,8 +876,13 @@ function useMyLocation(){
     const { latitude, longitude } = pos.coords;
     let name = 'My Location', country = '';
     try{
-      const r = await fetchJSON(`https://geocoding-api.open-meteo.com/v1/search?latitude=${latitude}&longitude=${longitude}`);
-    }catch(_){ /* reverse geocoding via this endpoint isn't supported; keep generic name */ }
+      // BigDataCloud's free client-side reverse-geocode endpoint needs no
+      // API key and is CORS-friendly — used only to resolve a display name
+      // for the coordinates geolocation already gave us.
+      const r = await fetchJSON(`${ENDPOINTS.BIGDATACLOUD_REVERSE}?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`);
+      name = r.city || r.locality || r.principalSubdivision || name;
+      country = r.countryCode || '';
+    }catch(e){ console.warn('Reverse geocoding unavailable, using generic location name', e); }
     loadCity(latitude, longitude, name, country);
   }, () => toast('Could not access your location'));
 }
@@ -790,4 +913,4 @@ function requestNotifications(){
 
 document.addEventListener('DOMContentLoaded', init);
 
-window.VAYU = { state, fmtTemp, wmoIcon };
+window.VAYU = { state, fmtTemp, wmoIcon, testUnsplash: testUnsplashForCities };

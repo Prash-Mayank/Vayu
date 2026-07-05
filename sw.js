@@ -1,10 +1,11 @@
-const SHELL_CACHE = 'vayu-shell-v3';
+const SHELL_CACHE = 'vayu-shell-v4';
 const API_CACHE = 'vayu-api-v1';
 
 const SHELL_ASSETS = [
   './',
   './index.html',
   './style.css',
+  './config.js',
   './script.js',
   './charts.js',
   './manifest.json',
@@ -21,12 +22,24 @@ const API_HOSTS = [
   'api.airvisual.com',
   'api.sunrise-sunset.org',
   'api.unsplash.com',
+  'api.bigdatacloud.net',
   'eonet.gsfc.nasa.gov',
 ];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(SHELL_CACHE).then((cache) => cache.addAll(SHELL_ASSETS)).then(() => self.skipWaiting())
+    caches.open(SHELL_CACHE).then((cache) =>
+      // cache.addAll() is all-or-nothing — one missing file (e.g. you
+      // haven't added assets/vayu_logo.png yet, or config.js doesn't
+      // exist until you copy it from config.example.js) would otherwise
+      // abort installation entirely and silently break offline support.
+      // Cache each asset independently instead so the rest still get in.
+      Promise.all(
+        SHELL_ASSETS.map((url) =>
+          cache.add(url).catch((err) => console.warn('[Vayu SW] could not pre-cache', url, err))
+        )
+      )
+    ).then(() => self.skipWaiting())
   );
 });
 
