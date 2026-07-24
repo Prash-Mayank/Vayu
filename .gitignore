@@ -1,15 +1,8 @@
-# Local API keys — never commit this. Copy config.example.js -> config.js
 config.js
-
-# OS / editor junk
 .DS_Store
 Thumbs.db
 *.swp
 .vscode/
 .idea/
-
-# Logs
 *.log
-
-# Dependencies (in case you ever add tooling later)
-node_modules/
+.hintrc

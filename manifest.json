@@ -1,5 +1,5 @@
 {
-  "name": "Vayu — Weather Intelligence",
+  "name": "Vayu : Weather Intelligence",
   "short_name": "Vayu",
   "description": "Multi-API weather intelligence platform with live air quality, astronomy and disaster alerts.",
   "start_url": "./index.html",

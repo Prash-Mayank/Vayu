@@ -1,25 +1,7 @@
-/* -----------------------------------------------------------
-   VAYU 2.0 — charts.js
-   Chart.js setup + update functions (Phase 7 deliverable)
-
-   Exposes window.VAYU.updateCharts(state) which script.js calls
-   every time loadCity() resolves new weather/AQI data.
-
-   Charts:
-     1. tempTrendChart  — 24h temperature trend (line, area fill)
-     2. precipChart     — precipitation probability (bar)
-     3. windChart       — hourly wind speed (sparkline/line)
-     4. aqiTrendChart   — AQI 24h trend (bar) — derived from the
-        real hourly temperature curve when no historical AQI
-        endpoint is available (documented in README as stubbed)
------------------------------------------------------------ */
 (function () {
   'use strict';
 
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  // Pull live theme colors from CSS custom properties so charts
-  // always match the current light/dark theme without duplicating values.
   function cssVar(name, fallback) {
     const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
     return v || fallback;
@@ -39,7 +21,6 @@
   }
 
   function hexToRGBA(hex, alpha) {
-    // accepts #rrggbb or rgb()/rgba() strings — normalize to rgba
     if (hex.startsWith('rgb')) {
       const nums = hex.match(/[\d.]+/g);
       return `rgba(${nums[0]},${nums[1]},${nums[2]},${alpha})`;
@@ -83,9 +64,6 @@
       },
     }, extra || {});
   }
-
-  // Chart instances, kept so we can destroy/recreate on each city load
-  // (Chart.js requires destroying before re-rendering on the same canvas).
   let tempTrendChart = null;
   let precipChart = null;
   let windChart = null;
@@ -105,8 +83,6 @@
     if (c === null || c === undefined || isNaN(c)) return null;
     return unit === 'F' ? Math.round((c * 9) / 5 + 32) : Math.round(c);
   }
-
-  /* ---------- 1. Temperature trend (line) ---------- */
   function renderTempTrend(canvas, hourly, unit, t) {
     const labels = hourly.map((h) => hourLabel(h.time));
     const data = hourly.map((h) => unitTemp(h.temp, unit));
@@ -160,8 +136,6 @@
       }),
     });
   }
-
-  /* ---------- 2. Precipitation probability (bar) ---------- */
   function renderPrecip(canvas, hourly, t) {
     const labels = hourly.map((h) => hourLabel(h.time));
     const data = hourly.map((h) => h.pop ?? 0);
@@ -205,8 +179,6 @@
       }),
     });
   }
-
-  /* ---------- 3. Wind speed (sparkline) ---------- */
   function renderWind(canvas, hourly, t) {
     const labels = hourly.map((h) => hourLabel(h.time));
     const data = hourly.map((h) => Math.round(h.wind ?? 0));
@@ -250,23 +222,15 @@
     });
   }
 
-  /* ---------- 4. AQI trend (bar) ----------
-     IQAir's free tier has no historical endpoint, so per the project
-     README this trend is shaped from the real hourly temperature curve
-     (pollution tends to track diurnal temperature/traffic patterns),
-     scaled around the current real AQI value. Swap for a real
-     historical call if your IQAir plan supports it. */
   function renderAqiTrend(canvas, hourly, currentAqi, t) {
     const labels = hourly.map((h) => hourLabel(h.time));
     const temps = hourly.map((h) => h.temp ?? 0);
     const minT = Math.min(...temps), maxT = Math.max(...temps);
     const range = maxT - minT || 1;
     const base = currentAqi ?? 50;
-
-    // Map temperature curve to a +/-30% wobble around the current AQI value.
     const data = temps.map((tmp) => {
-      const norm = (tmp - minT) / range; // 0..1
-      const wobble = (norm - 0.5) * 0.6; // -0.3..0.3
+      const norm = (tmp - minT) / range; 
+      const wobble = (norm - 0.5) * 0.6; 
       return Math.max(5, Math.round(base * (1 + wobble)));
     });
 
@@ -310,7 +274,6 @@
     });
   }
 
-  /* ---------- Public entry point ---------- */
   function updateCharts(state) {
     if (typeof Chart === 'undefined') {
       console.warn('Chart.js failed to load — charts skipped.');
@@ -332,9 +295,6 @@
     if (windCanvas) renderWind(windCanvas, w.hourly, t);
     if (aqiCanvas) renderAqiTrend(aqiCanvas, w.hourly, state.aqi ? state.aqi.aqi : null, t);
   }
-
-  // Re-theme + re-render in place (colors only) when the user flips
-  // light/dark — cheaper than waiting for the next city search.
   function refreshTheme() {
     if (window.__vayuLastState) updateCharts(window.__vayuLastState);
   }
@@ -346,15 +306,10 @@
   };
   window.VAYU.refreshChartTheme = refreshTheme;
   window.VAYU._destroyCharts = destroyAll;
-  // Called by script.js's switchView() — Chart.js measures canvases at
-  // creation time, so a chart built while its tab is display:none gets
-  // stuck at 0x0. Resizing after the tab becomes visible fixes it.
+
   window.VAYU.resizeCharts = function () {
     [tempTrendChart, precipChart, windChart, aqiTrendChart].forEach((c) => c && c.resize());
   };
-
-  // Watch the theme switches that already exist in index.html so charts
-  // re-color instantly instead of waiting for the next API call.
   document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.switch, #themeToggleTop').forEach((el) => {
       el.addEventListener('click', () => setTimeout(refreshTheme, 50));

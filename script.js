@@ -1,6 +1,3 @@
-// API keys now live in config.js (gitignored — see config.example.js for the
-// template). config.js must be loaded via a <script> tag BEFORE this file.
-// We never hardcode real keys here so this file is safe to commit publicly.
 if (!window.VAYU_CONFIG) {
   console.warn(
     '[Vayu] config.js not found or loaded after script.js. ' +
@@ -40,7 +37,7 @@ const state = {
   lon: 77.2090,
   unit: localStorage.getItem('vayuUnit') || 'C',
   theme: localStorage.getItem('vayuTheme') || 'dark',
-  weather: null,     // normalized current+hourly+daily
+  weather: null,    
   aqi: null,
   astro: null,
   events: [],
@@ -60,10 +57,6 @@ function escapeHtml(str){
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
 }
-
-/* -----------------------------------------------------------
-   3. WMO weather code → { icon, label } (used by Open-Meteo)
------------------------------------------------------------ */
 const WMO = {
   0:['fa-sun','Clear sky'], 1:['fa-cloud-sun','Mainly clear'], 2:['fa-cloud-sun','Partly cloudy'], 3:['fa-cloud','Overcast'],
   45:['fa-smog','Fog'], 48:['fa-smog','Depositing rime fog'],
@@ -82,17 +75,11 @@ function nightIcon(icon){
   const map = { 'fa-sun':'fa-moon', 'fa-cloud-sun':'fa-cloud-moon' };
   return map[icon] || icon;
 }
-
-/* -----------------------------------------------------------
-   4. FETCH HELPERS
------------------------------------------------------------ */
 async function fetchJSON(url, opts){
   const res = await fetch(url, opts);
   if(!res.ok) throw new Error('HTTP ' + res.status + ' on ' + url);
   return res.json();
 }
-
-// Geocoding (no key) — used for the search box
 async function geocodeCity(name){
   const url = `${ENDPOINTS.GEOCODE}?name=${encodeURIComponent(name)}&count=6&language=en&format=json`;
   const data = await fetchJSON(url);
@@ -101,16 +88,12 @@ async function geocodeCity(name){
     lat: r.latitude, lon: r.longitude,
   }));
 }
-
-// PRIMARY: OpenWeatherMap current + forecast (needs OWM_KEY)
 async function fetchOWM(lat, lon){
   if(!CONFIG.OWM_KEY) throw new Error('No OWM key configured');
   const cur = await fetchJSON(`${ENDPOINTS.OWM_CURRENT}?lat=${lat}&lon=${lon}&units=metric&appid=${CONFIG.OWM_KEY}`);
   const fc = await fetchJSON(`${ENDPOINTS.OWM_FORECAST}?lat=${lat}&lon=${lon}&units=metric&appid=${CONFIG.OWM_KEY}`);
   return { source:'owm', current: cur, forecast: fc };
 }
-
-// BACKUP: Open-Meteo (no key) — also used as primary when OWM key is absent
 async function fetchOpenMeteo(lat, lon){
   const url = `${ENDPOINTS.OPEN_METEO}?latitude=${lat}&longitude=${lon}` +
     `&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,surface_pressure,visibility` +
@@ -120,33 +103,22 @@ async function fetchOpenMeteo(lat, lon){
   const data = await fetchJSON(url);
   return { source:'open-meteo', data };
 }
-
-// IQAir AQI (needs IQAIR_KEY)
 async function fetchIQAir(lat, lon){
   if(!CONFIG.IQAIR_KEY) throw new Error('No IQAir key configured');
   return fetchJSON(`${ENDPOINTS.IQAIR}?lat=${lat}&lon=${lon}&key=${CONFIG.IQAIR_KEY}`);
 }
-
-// Fallback AQI via Open-Meteo Air Quality API (no key) so the panel
-// still shows real numbers if an IQAir key hasn't been added yet.
 async function fetchOpenMeteoAQI(lat, lon){
   const url = `${ENDPOINTS.OPEN_METEO_AQI}?latitude=${lat}&longitude=${lon}` +
     `&current=us_aqi,pm2_5,pm10,ozone,nitrogen_dioxide,sulphur_dioxide,carbon_monoxide`;
   return fetchJSON(url);
 }
-
-// Sunrise-Sunset.org (no key)
 async function fetchSunriseSunset(lat, lon){
   const url = `${ENDPOINTS.SUNRISE_SUNSET}?lat=${lat}&lng=${lon}&formatted=0`;
   const data = await fetchJSON(url);
   return data.results;
 }
-
-// Unsplash background (needs UNSPLASH_KEY)
 async function fetchUnsplash(city, condition, country){
   if(!CONFIG.UNSPLASH_KEY) throw new Error('No Unsplash key configured');
-  // Include country in the cache key — "Paris, FR" and "Paris, US" (Texas)
-  // are different cities and shouldn't share a cached photo.
   const cacheKey = `vayuPhoto:${city.toLowerCase()}:${(country || '').toLowerCase()}`;
   const cached = JSON.parse(localStorage.getItem(cacheKey) || 'null');
   if(cached && Date.now() - cached.ts < LIMITS.PHOTO_CACHE_MS) return cached;
@@ -164,9 +136,6 @@ async function fetchUnsplash(city, condition, country){
     try{
       const url = `${ENDPOINTS.UNSPLASH_SEARCH}?query=${encodeURIComponent(q)}&per_page=1&orientation=landscape&client_id=${CONFIG.UNSPLASH_KEY}`;
       const res = await fetch(url);
-      // 401 = bad/missing access key, 403 = rate limit (50 req/hr on the
-      // free tier) — both apply to every query this call would try, so
-      // stop immediately instead of burning the rest of the hourly quota.
       if(res.status === 401){
         lastErr = new Error('Unsplash 401 Unauthorized — check UNSPLASH_KEY in config.js');
         console.error(`[Vayu/Unsplash] "${city}":`, lastErr.message);
@@ -184,7 +153,8 @@ async function fetchUnsplash(city, condition, country){
       }
       const data = await res.json();
       photo = data.results && data.results[0];
-      if(photo){ console.info(`[Vayu/Unsplash] "${city}" ✓ matched on query "${q}"`); break; }
+      if(photo){ 
+        break; }
       console.warn(`[Vayu/Unsplash] "${city}": no results for query "${q}", trying next fallback…`);
     }catch(e){
       lastErr = e;
@@ -205,30 +175,6 @@ async function fetchUnsplash(city, condition, country){
   localStorage.setItem('vayuUnsplashCredit', JSON.stringify(result));
   return result;
 }
-
-// Manual QA helper — run window.VAYU.testUnsplash() in the browser console
-// to batch-check a spread of city names/types and see exactly which ones
-// succeed, get rate-limited, or come back empty. Logs a summary table.
-async function testUnsplashForCities(cities){
-  cities = cities || [
-    'New Delhi', 'Tokyo', 'Paris', 'New York', 'Cairo', 'Reykjavik',
-    'Dharamshala', 'São Paulo', 'Wellington', 'Ulaanbaatar',
-  ];
-  const rows = [];
-  for(const city of cities){
-    const start = performance.now();
-    try{
-      const photo = await fetchUnsplash(city, 'clear sky', '');
-      rows.push({ city, status: 'OK', ms: Math.round(performance.now()-start), url: photo.url });
-    }catch(e){
-      rows.push({ city, status: 'FAILED', ms: Math.round(performance.now()-start), error: e.message });
-    }
-  }
-  console.table(rows);
-  return rows;
-}
-
-// NASA EONET — once per session, cached in sessionStorage
 async function fetchEonet(){
   const cached = sessionStorage.getItem('vayuEonet');
   if(cached) return JSON.parse(cached);
@@ -242,10 +188,6 @@ function haversine(lat1, lon1, lat2, lon2){
   const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 }
-
-/* -----------------------------------------------------------
-   5. NORMALIZE — merge OWM/Open-Meteo into one shape the UI uses
------------------------------------------------------------ */
 function normalizeWeather(owmResult, omResult){
   if(owmResult && owmResult.status === 'fulfilled'){
     const { current, forecast } = owmResult.value;
@@ -278,7 +220,6 @@ function normalizeWeather(owmResult, omResult){
       hourly, daily,
     };
   }
-  // Fall back fully to Open-Meteo
   if(omResult && omResult.status === 'fulfilled'){
     const d = omResult.value.data;
     const hourly = d.hourly.time.slice(0,8).map((t,i) => ({
@@ -315,19 +256,11 @@ function owmCodeToIcon(id){
   if(id === 801 || id === 802) return 'fa-cloud-sun';
   return 'fa-cloud';
 }
-
-/* -----------------------------------------------------------
-   6. UNIT HELPERS
------------------------------------------------------------ */
 function fmtTemp(c){
   if(c === null || c === undefined || isNaN(c)) return '--°';
   const v = state.unit === 'F' ? (c*9/5+32) : c;
   return Math.round(v) + '°';
 }
-
-/* -----------------------------------------------------------
-   7. RENDERING
------------------------------------------------------------ */
 function setGreeting(){
   const h = new Date().getHours();
   const g = h < 12 ? 'Good Morning' : h < 17 ? 'Good Afternoon' : h < 21 ? 'Good Evening' : 'Good Night';
@@ -450,17 +383,15 @@ function renderAstronomy(){
   const pmStr = `${timeFromISO(goldenPMStart)} - ${timeFromISO(goldenPMEnd)}`;
   $('goldenAM').textContent = amStr; $('goldenAMFull').textContent = amStr;
   $('goldenPM').textContent = pmStr; $('goldenPMFull').textContent = pmStr;
-
-  // position the sun marker along the CSS arc based on % of daylight elapsed
   const now = new Date();
   let frac = (now - sunrise) / (sunset - sunrise);
   frac = Math.max(0, Math.min(1, frac));
-  const angle = Math.PI * (1 - frac); // PI -> 0 left to right
+  const angle = Math.PI * (1 - frac);
   ['sunMarker','sunMarkerFull'].forEach(id => {
     const el = $(id);
     if(!el) return;
-    const x = 50 - 50*Math.cos(angle); // 0–100%
-    const y = Math.sin(angle) * 100;   // 0 (horizon) –100 (peak) %
+    const x = 50 - 50*Math.cos(angle); 
+    const y = Math.sin(angle) * 100; 
     el.style.left = x + '%';
     el.style.bottom = y + '%';
   });
@@ -504,11 +435,6 @@ function renderAlertBanner(){
     $('noAlertCard').style.display = 'flex';
   }
 }
-
-// Crossfades the hero photo by alternating between two stacked layers
-// (heroBgA / heroBgB) instead of swapping background-image directly —
-// background-image changes can't be CSS-transitioned, so we fade opacity
-// between two pre-set layers instead. See style.css .hero-bg / .is-active.
 let heroActiveLayer = 'A';
 function setHeroBackground(bgImageCss){
   const a = $('heroBgA'), b = $('heroBgB');
@@ -516,8 +442,6 @@ function setHeroBackground(bgImageCss){
   const showEl = heroActiveLayer === 'A' ? b : a;
   const hideEl = heroActiveLayer === 'A' ? a : b;
   showEl.style.backgroundImage = bgImageCss;
-  // Set on next frame so the browser registers the starting (opacity:0)
-  // state before we flip it — otherwise the fade can be skipped.
   requestAnimationFrame(() => {
     showEl.classList.add('is-active');
     hideEl.classList.remove('is-active');
@@ -533,22 +457,15 @@ function renderHeroBackground(photo){
     $('photoCreditLink').textContent = photo.photographer;
     $('photoCreditLink').href = photo.link;
   } else {
-    // gradient fallback, themed loosely by condition
     setHeroBackground(`${overlay}, linear-gradient(160deg,#0c2540,#0a1322)`);
     $('photoCredit').hidden = true;
   }
 }
-
-/* -----------------------------------------------------------
-   8. LOAD CITY — the full orchestration sequence
------------------------------------------------------------ */
 let loadToken = 0;
 async function loadCity(lat, lon, name, country){
   const myToken = ++loadToken;
   state.lat = lat; state.lon = lon; state.city = name; state.country = country || '';
   toast(`Loading ${name}…`);
-
-  // [1+2] primary + backup weather in parallel
   const [owmRes, omRes] = await Promise.allSettled([ fetchOWM(lat, lon), fetchOpenMeteo(lat, lon) ]);
   if(myToken !== loadToken) return;
   try{
@@ -562,8 +479,6 @@ async function loadCity(lat, lon, name, country){
   if(window.VAYU && window.VAYU.updateCharts) window.VAYU.updateCharts(state);
   saveRecent(name, country, lat, lon);
   saveLastCity();
-
-  // [3] AQI — IQAir if keyed, else Open-Meteo AQI fallback (non-blocking for hero)
   (async () => {
     try{
       const data = await fetchIQAir(lat, lon);
@@ -583,24 +498,18 @@ async function loadCity(lat, lon, name, country){
       if(window.VAYU && window.VAYU.updateCharts) window.VAYU.updateCharts(state);
     }
   })();
-
-  // [4] Astronomy — non-blocking
   (async () => {
     try{
       state.astro = await fetchSunriseSunset(lat, lon);
       if(myToken === loadToken) renderAstronomy();
     }catch(e){ console.warn('Astronomy unavailable', e); }
   })();
-
-  // [5] Unsplash background — non-blocking
   (async () => {
     try{
       const photo = await fetchUnsplash(name, state.weather.current.condition, country);
       if(myToken === loadToken) renderHeroBackground(photo);
     }catch(_){ if(myToken === loadToken) renderHeroBackground(null); }
   })();
-
-  // [6] NASA EONET — once per session
   (async () => {
     try{
       const events = await fetchEonet();
@@ -618,10 +527,6 @@ async function loadCity(lat, lon, name, country){
     }catch(e){ console.warn('EONET unavailable', e); }
   })();
 }
-
-/* -----------------------------------------------------------
-   9. STATE PERSISTENCE (localStorage)
------------------------------------------------------------ */
 function saveLastCity(){
   localStorage.setItem('vayuLastCity', JSON.stringify({ name:state.city, country:state.country, lat:state.lat, lon:state.lon }));
 }
@@ -683,29 +588,16 @@ function updateFavIcons(){
   const fav = isFavorite(state.city);
   qsa('#favBtn i, #favBtnMobile i').forEach(i => { i.className = fav ? 'fa-solid fa-star' : 'fa-regular fa-star'; });
 }
-
-/* -----------------------------------------------------------
-   10. VIEW NAVIGATION
------------------------------------------------------------ */
 function switchView(view){
   qsa('.view').forEach(v => v.classList.toggle('active', v.id === 'view-' + view));
   qsa('.nav-link').forEach(b => b.classList.toggle('active', b.dataset.view === view));
   qsa('.bn-btn[data-view]').forEach(b => b.classList.toggle('active', b.dataset.view === view));
   closeDrawer(); closeSheet();
   window.scrollTo({ top:0, behavior:'smooth' });
-  // Chart.js measures canvases at creation time, so a chart built while its
-  // tab was display:none gets stuck at 0x0. Only the dashboard (temp/precip/
-  // wind) and air-quality (AQI trend) tabs hold canvases, so only rebuild
-  // when entering one of those — avoids a pointless re-animate on every
-  // unrelated nav click (Settings, Favourites, etc).
   if((view === 'dashboard' || view === 'airquality') && window.VAYU && window.VAYU.updateCharts){
     requestAnimationFrame(() => window.VAYU.updateCharts(state));
   }
 }
-
-/* -----------------------------------------------------------
-   11. SEARCH (debounced, 800ms) + autocomplete
------------------------------------------------------------ */
 let searchTimer = null;
 function bindSearch(input, onPick){
   input.addEventListener('input', () => {
@@ -735,10 +627,6 @@ function showSuggestions(results, onPick, input){
     });
   });
 }
-
-/* -----------------------------------------------------------
-   12. COMPARE MODE
------------------------------------------------------------ */
 async function loadCompare(slot, lat, lon, name, country){
   try{
     const om = await fetchOpenMeteo(lat, lon);
@@ -769,10 +657,6 @@ function compareCardHTML(c, other){
     `<div class="compare-stat"><span>${label}</span><span class="${better===true?'better':better===false?'worse':''}">${val}</span></div>`
   ).join('');
 }
-
-/* -----------------------------------------------------------
-   13. UI CHROME (drawer, sheet, theme, units, toast)
------------------------------------------------------------ */
 function toast(msg){
   const t = $('toast');
   t.textContent = msg;
@@ -802,15 +686,9 @@ function applyUnit(){
   renderHero(); renderHourly(); renderDaily(); renderCompare();
 }
 function setUnit(u){ state.unit = u; applyUnit(); }
-
-/* -----------------------------------------------------------
-   14. EVENT WIRING
------------------------------------------------------------ */
 function init(){
   applyTheme();
   applyUnit();
-
-  // Nav (sidebar + drawer + sheet + bottom nav)
   qsa('[data-view]').forEach(btn => btn.addEventListener('click', () => switchView(btn.dataset.view)));
 
   $('menuToggle').addEventListener('click', openDrawer);
@@ -835,8 +713,6 @@ function init(){
       localStorage.setItem('vayuNotificationsEnabled','false');
     }
   });
-
-  // search
   bindSearch($('citySearch'), (r) => loadCity(r.lat, r.lon, r.name, r.country));
   document.addEventListener('click', (e) => {
     if(!e.target.closest('.search-row')) { const s = $('searchSuggestions'); if(s) s.hidden = true; }
@@ -845,19 +721,13 @@ function init(){
   bindSearch($('compareCityA'), (r) => loadCompare('A', r.lat, r.lon, r.name, r.country));
   bindSearch($('compareCityB'), (r) => loadCompare('B', r.lat, r.lon, r.name, r.country));
   $('compareToggleBtn').addEventListener('click', () => switchView('compare'));
-
-  // geolocation
   ['useMyLocation','useLocBtnInline'].forEach(id => $(id).addEventListener('click', useMyLocation));
-
-  // PWA install
   let deferredPrompt;
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault(); deferredPrompt = e;
     const btn = $('installBtn'); btn.disabled = false;
     btn.addEventListener('click', () => { deferredPrompt.prompt(); }, { once:true });
   });
-
-  // initial city: last saved -> else default New Delhi
   const last = JSON.parse(localStorage.getItem('vayuLastCity') || 'null');
   renderFavorites(); renderRecent();
   if(last){ loadCity(last.lat, last.lon, last.name, last.country); }
@@ -865,10 +735,9 @@ function init(){
   updateFavIcons();
 
   if('serviceWorker' in navigator){
-    navigator.serviceWorker.register('sw.js').catch(() => {/* offline shell unavailable on file:// */});
+    navigator.serviceWorker.register('sw.js').catch(() => {});
   }
 }
-
 function useMyLocation(){
   if(!navigator.geolocation){ toast('Geolocation not supported on this device'); return; }
   toast('Locating you…');
@@ -876,9 +745,6 @@ function useMyLocation(){
     const { latitude, longitude } = pos.coords;
     let name = 'My Location', country = '';
     try{
-      // BigDataCloud's free client-side reverse-geocode endpoint needs no
-      // API key and is CORS-friendly — used only to resolve a display name
-      // for the coordinates geolocation already gave us.
       const r = await fetchJSON(`${ENDPOINTS.BIGDATACLOUD_REVERSE}?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`);
       name = r.city || r.locality || r.principalSubdivision || name;
       country = r.countryCode || '';
@@ -913,4 +779,4 @@ function requestNotifications(){
 
 document.addEventListener('DOMContentLoaded', init);
 
-window.VAYU = { state, fmtTemp, wmoIcon, testUnsplash: testUnsplashForCities };
+window.VAYU = { state, fmtTemp, wmoIcon };

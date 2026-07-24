@@ -1,6 +1,5 @@
 const SHELL_CACHE = 'vayu-shell-v4';
 const API_CACHE = 'vayu-api-v1';
-
 const SHELL_ASSETS = [
   './',
   './index.html',
@@ -13,7 +12,6 @@ const SHELL_ASSETS = [
   './assets/icon-192.png',
   './assets/icon-512.png',
 ];
-
 const API_HOSTS = [
   'api.openweathermap.org',
   'api.open-meteo.com',
@@ -25,15 +23,9 @@ const API_HOSTS = [
   'api.bigdatacloud.net',
   'eonet.gsfc.nasa.gov',
 ];
-
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(SHELL_CACHE).then((cache) =>
-      // cache.addAll() is all-or-nothing — one missing file (e.g. you
-      // haven't added assets/vayu_logo.png yet, or config.js doesn't
-      // exist until you copy it from config.example.js) would otherwise
-      // abort installation entirely and silently break offline support.
-      // Cache each asset independently instead so the rest still get in.
       Promise.all(
         SHELL_ASSETS.map((url) =>
           cache.add(url).catch((err) => console.warn('[Vayu SW] could not pre-cache', url, err))
@@ -54,7 +46,6 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
-  // Network First for API calls
   if(API_HOSTS.includes(url.hostname)){
     event.respondWith(
       fetch(event.request)

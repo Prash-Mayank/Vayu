@@ -4,32 +4,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Vayu — Weather Intelligence</title>
+    <title>Vayu : Weather Intelligence</title>
     <meta name="description"
         content="Vayu is a multi-API weather intelligence platform with real-time air quality, astronomy and disaster alerts.">
     <meta name="theme-color" content="#0a1220">
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="assets/icon-32.png">
     <link rel="apple-touch-icon" href="assets/icon-192.png">
-
-    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link
         href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap"
         rel="stylesheet">
-
-    <!-- Icons (Font Awesome — used in place of emoji/SVG) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-
-    <!-- Charts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body data-theme="dark">
-
-    <!-- ============ MOBILE TOP BAR ============ -->
     <header class="topbar">
         <button class="icon-btn only-mobile" id="menuToggle" aria-label="Open menu"><i
                 class="fa-solid fa-bars"></i></button>
@@ -58,8 +50,6 @@
     </header>
 
     <div class="app-shell">
-
-        <!-- ============ SIDEBAR (desktop) ============ -->
         <nav class="sidebar only-desktop" id="sidebar" aria-label="Primary">
             <div class="sidebar-brand">
                 <img src="assets/vayu_logo.png" alt="" class="brand-logo lg">
@@ -115,8 +105,6 @@
                 </button>
             </div>
         </nav>
-
-        <!-- ============ MOBILE DRAWER ============ -->
         <div class="drawer-overlay" id="drawerOverlay"></div>
         <nav class="drawer" id="drawer" aria-label="Menu">
             <ul class="nav-list">
@@ -148,8 +136,6 @@
                 <span><i class="fa-solid fa-moon"></i></span>
             </div>
         </nav>
-
-        <!-- ============ MAIN ============ -->
         <main class="main" id="mainContent">
 
             <div class="search-row">
@@ -164,8 +150,6 @@
                 <button class="btn-outline" id="compareToggleBtn"><i class="fa-solid fa-scale-balanced"></i><span
                         class="compare-label">&nbsp;Compare</span></button>
             </div>
-
-            <!-- ===== DASHBOARD VIEW ===== -->
             <section class="view active" id="view-dashboard">
 
                 <div class="grid-top">
@@ -346,8 +330,6 @@
                         rel="noopener">Unsplash</a></p>
 
             </section>
-
-            <!-- ===== AIR QUALITY (full) VIEW ===== -->
             <section class="view" id="view-airquality">
                 <article class="card">
                     <div class="card-head">
@@ -358,8 +340,6 @@
                     <div class="chart-wrap tall"><canvas id="aqiTrendChart"></canvas></div>
                 </article>
             </section>
-
-            <!-- ===== ASTRONOMY (full) VIEW ===== -->
             <section class="view" id="view-astronomy">
                 <article class="card">
                     <div class="card-head">
@@ -389,8 +369,6 @@
                     </div>
                 </article>
             </section>
-
-            <!-- ===== FORECAST (full) VIEW ===== -->
             <section class="view" id="view-forecast">
                 <article class="card">
                     <div class="card-head">
@@ -405,8 +383,6 @@
                     <div class="hourly-scroll" id="hourlyScrollFull"></div>
                 </article>
             </section>
-
-            <!-- ===== ALERTS VIEW ===== -->
             <section class="view" id="view-alerts">
                 <article class="card">
                     <div class="card-head">
@@ -416,8 +392,6 @@
                     <ul class="event-list" id="eventList"></ul>
                 </article>
             </section>
-
-            <!-- ===== COMPARE VIEW ===== -->
             <section class="view" id="view-compare">
                 <article class="card">
                     <div class="card-head">
@@ -446,8 +420,6 @@
                     </div>
                 </article>
             </section>
-
-            <!-- ===== FAVOURITES VIEW ===== -->
             <section class="view" id="view-favourites">
                 <article class="card">
                     <div class="card-head">
@@ -459,8 +431,6 @@
                     </ul>
                 </article>
             </section>
-
-            <!-- ===== RECENT VIEW ===== -->
             <section class="view" id="view-recent">
                 <article class="card">
                     <div class="card-head">
@@ -472,8 +442,6 @@
                     </ul>
                 </article>
             </section>
-
-            <!-- ===== MAPS VIEW ===== -->
             <section class="view" id="view-maps">
                 <article class="card empty-state">
                     <i class="fa-solid fa-map"></i>
@@ -481,8 +449,6 @@
                     <p>Radar and satellite overlays are planned for a future Vayu release.</p>
                 </article>
             </section>
-
-            <!-- ===== SETTINGS VIEW ===== -->
             <section class="view" id="view-settings">
                 <article class="card">
                     <div class="card-head">
@@ -498,36 +464,32 @@
                             <button class="seg-btn" data-unit="F">°F</button>
                         </div>
                     </div>
-
-                    <div class="settings-row">
-                        <div><strong>Theme</strong>
-                            <p class="muted">Switch between light and dark mode.</p>
-                        </div>
-                        <button class="switch theme-switch" id="themeSwitchSettings" role="switch" aria-checked="true"
-                            aria-label="Toggle dark mode"><span class="switch-thumb"></span></button>
+                    <div><strong>Theme</strong>
+                        <p class="muted">Switch between light and dark mode.</p>
                     </div>
-
-                    <div class="settings-row">
-                        <div><strong>Notifications</strong>
-                            <p class="muted">Weather updates and severe alerts.</p>
-                        </div>
-                        <button class="switch" id="notifSwitch" role="switch" aria-checked="false"
-                            aria-label="Toggle notifications"><span class="switch-thumb"></span></button>
-                    </div>
-
-                    <div class="settings-row">
-                        <div><strong>Install App</strong>
-                            <p class="muted">Add Vayu to your home screen for offline access.</p>
-                        </div>
-                        <button class="btn-outline" id="installBtn" disabled>Install</button>
-                    </div>
-                </article>
-            </section>
-
-        </main>
+                    <button class="switch theme-switch" id="themeSwitchSettings" role="switch" aria-checked="true"
+                        aria-label="Toggle dark mode"><span class="switch-thumb"></span></button>
     </div>
 
-    <!-- Bottom nav (mobile) -->
+    <div class="settings-row">
+        <div><strong>Notifications</strong>
+            <p class="muted">Weather updates and severe alerts.</p>
+        </div>
+        <button class="switch" id="notifSwitch" role="switch" aria-checked="false"
+            aria-label="Toggle notifications"><span class="switch-thumb"></span></button>
+    </div>
+
+    <div class="settings-row">
+        <div><strong>Install App</strong>
+            <p class="muted">Add Vayu to your home screen for offline access.</p>
+        </div>
+        <button class="btn-outline" id="installBtn" disabled>Install</button>
+    </div>
+    </article>
+    </section>
+
+    </main>
+    </div>
     <nav class="bottom-nav only-mobile" aria-label="Primary">
         <button class="bn-btn active" data-view="dashboard"><i
                 class="fa-solid fa-house"></i><span>Dashboard</span></button>
@@ -556,8 +518,6 @@
     </div>
 
     <div class="toast" id="toast"></div>
-
-    <!-- Local API keys (gitignored) — must load before script.js -->
     <script src="config.js"></script>
     <script src="script.js"></script>
     <script src="charts.js"></script>
