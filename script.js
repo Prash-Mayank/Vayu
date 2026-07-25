@@ -433,12 +433,14 @@ function dominantPollutant(a) {
 
 function renderAQI() {
   const a = state.aqi;
-  $('iqairKeyNote').hidden = !!CONFIG.IQAIR_KEY;
   if (!a) {
+    $('iqairKeyNote').hidden = true;
     qsa('.aqi-number').forEach(el => el.textContent = '--');
     qsa('.health-advisory').forEach(el => el.textContent = 'Air quality data will appear once a city is loaded.');
     return;
   }
+  $('iqairKeyNote').hidden = a.source === 'IQAir';
+  qsa('.aqi-source-label').forEach(el => el.textContent = a.source === 'IQAir' ? '(IQAir)' : '(Open-Meteo)');
   const band = aqiBand(a.aqi);
   const colorVar = `var(--${band.cls === 'usg' ? 'unhealthy' : band.cls})`;
   qsa('.aqi-number').forEach(el => { el.textContent = a.aqi; el.style.color = colorVar; });
@@ -639,20 +641,26 @@ async function loadCity(lat, lon, name, country) {
   saveRecent(name, country, lat, lon);
   saveLastCity();
   (async () => {
+    let pollutants = { pm25: '--', pm10: '--', o3: '--', no2: '--', so2: '--', co: '--' };
+    let aqiValue = null;
+    let source = 'Open-Meteo Air Quality API';
+    try {
+      const fb = await fetchOpenMeteoAQI(lat, lon);
+      const c = fb.current;
+      pollutants = {
+        pm25: Math.round(c.pm2_5), pm10: Math.round(c.pm10), o3: Math.round(c.ozone),
+        no2: Math.round(c.nitrogen_dioxide), so2: Math.round(c.sulphur_dioxide),
+        co: (c.carbon_monoxide / 1000).toFixed(1),
+      };
+      aqiValue = Math.round(c.us_aqi);
+    } catch (e) { console.warn('Open-Meteo AQI unavailable', e); }
     try {
       const data = await fetchIQAir(lat, lon);
-      const p = data.data.current.pollution;
-      state.aqi = { aqi: p.aqius, pm25: p.p2 ? Math.round(p.p2 * 100) / 100 : '--', pm10: '--', o3: '--', no2: '--', so2: '--', co: '--', source: 'IQAir' };
-    } catch (_) {
-      try {
-        const fb = await fetchOpenMeteoAQI(lat, lon);
-        const c = fb.current;
-        state.aqi = {
-          aqi: Math.round(c.us_aqi), pm25: Math.round(c.pm2_5), pm10: Math.round(c.pm10),
-          o3: Math.round(c.ozone), no2: Math.round(c.nitrogen_dioxide), so2: Math.round(c.sulphur_dioxide),
-          co: (c.carbon_monoxide / 1000).toFixed(1), source: 'Open-Meteo Air Quality API',
-        };
-      } catch (e) { console.warn('AQI unavailable', e); }
+      aqiValue = data.data.current.pollution.aqius;
+      source = 'IQAir';
+    } catch (_) { }
+    if (aqiValue !== null) {
+      state.aqi = { aqi: aqiValue, ...pollutants, source };
     }
     if (myToken === loadToken) {
       renderAQI(); renderQuickCards();
