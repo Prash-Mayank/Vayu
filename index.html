@@ -159,86 +159,64 @@
             </div>
 
             <section class="view active" id="view-dashboard">
-                <div class="grid-top">
-                    <article class="card hero-card" id="heroCard">
-                        <div class="hero-bg is-active" id="heroBgA"
-                            style="background-image:linear-gradient(180deg, rgba(7,13,24,0.35), rgba(7,13,24,0.85)), url('https://images.unsplash.com/photo-1587474260584-136574528ed5?auto=format&fit=crop&w=1400&q=60')">
-                        </div>
-                        <div class="hero-bg" id="heroBgB"></div>
-                        <div class="hero-overlay">
-                            <div class="hero-top">
-                                <div>
-                                    <p class="greeting" id="greeting">Hello 👋</p>
-                                    <h1 class="city-name"><span id="cityName">New Delhi, India</span> <i
-                                            class="fa-solid fa-location-dot"></i></h1>
-                                    <p class="city-date" id="cityDate">Loading date…</p>
-                                </div>
-                                <div class="hi-lo">
-                                    <span><i class="fa-solid fa-arrow-up"></i> <span id="tempHigh">--°</span></span>
-                                    <span><i class="fa-solid fa-arrow-down"></i> <span id="tempLow">--°</span></span>
-                                    <button class="icon-btn tiny share-btn" id="shareBtn"
-                                        aria-label="Share current weather"><i
-                                            class="fa-solid fa-share-nodes"></i></button>
-                                </div>
+                <article class="card hero-card" id="heroCard">
+                    <div class="hero-bg is-active" id="heroBgA"
+                        style="background-image:linear-gradient(180deg, rgba(7,13,24,0.35), rgba(7,13,24,0.85)), url('https://images.unsplash.com/photo-1587474260584-136574528ed5?auto=format&fit=crop&w=1400&q=60')">
+                    </div>
+                    <div class="hero-bg" id="heroBgB"></div>
+                    <div class="hero-overlay">
+                        <div class="hero-top">
+                            <div>
+                                <p class="greeting" id="greeting">Hello 👋</p>
+                                <h1 class="city-name"><span id="cityName">New Delhi, India</span> <i
+                                        class="fa-solid fa-location-dot"></i></h1>
+                                <p class="city-date" id="cityDate">Loading date…</p>
                             </div>
-                            <div class="hero-mid">
-                                <i class="fa-solid fa-cloud-sun weather-icon" id="currentIcon"></i>
-                                <div class="temp-block">
-                                    <span class="temp-big mono" id="currentTemp">--°</span>
-                                    <div class="temp-meta">
-                                        <span id="currentCondition">—</span>
-                                        <span id="feelsLike" class="muted">Feels like --°</span>
-                                    </div>
-                                </div>
-                                <div class="hero-astro only-desktop">
-                                    <div><i class="fa-solid fa-sun"></i> Sunrise <strong
-                                            id="sunriseTimeHero">--:--</strong></div>
-                                    <div><i class="fa-solid fa-sun"></i> Sunset <strong
-                                            id="sunsetTimeHero">--:--</strong></div>
-                                    <div><i class="fa-solid fa-circle-half-stroke"></i> Solar Noon <strong
-                                            id="solarNoonTimeHero">--:--</strong></div>
-                                    <div><i class="fa-solid fa-hourglass-half"></i> Day Length <strong
-                                            id="dayLengthHero">--</strong></div>
-                                    <div><i class="fa-solid fa-cloud-sun"></i> Golden Hour <strong
-                                            id="goldenPMHero">--</strong></div>
-                                </div>
-                            </div>
-                            <div class="stat-grid">
-                                <div class="stat"><i class="fa-solid fa-droplet"></i>
-                                    <div><small>Humidity</small><strong id="statHumidity">--%</strong></div>
-                                </div>
-                                <div class="stat"><i class="fa-solid fa-wind"></i>
-                                    <div><small>Wind</small><strong id="statWind">-- km/h</strong></div>
-                                </div>
-                                <div class="stat"><i class="fa-solid fa-gauge-high"></i>
-                                    <div><small>Pressure</small><strong id="statPressure">-- hPa</strong></div>
-                                </div>
-                                <div class="stat"><i class="fa-solid fa-eye"></i>
-                                    <div><small>Visibility</small><strong id="statVisibility">-- km</strong></div>
-                                </div>
+                            <div class="hi-lo">
+                                <span><i class="fa-solid fa-arrow-up"></i> <span id="tempHigh">--°</span></span>
+                                <span><i class="fa-solid fa-arrow-down"></i> <span id="tempLow">--°</span></span>
+                                <button class="icon-btn tiny share-btn" id="shareBtn"
+                                    aria-label="Share current weather"><i class="fa-solid fa-share-nodes"></i></button>
                             </div>
                         </div>
-                    </article>
-
-                    <article class="card alert-card" id="alertCard" hidden>
-                        <div class="alert-head">
-                            <i class="fa-solid fa-triangle-exclamation"></i>
-                            <span>Active Alert</span>
-                            <button class="icon-btn tiny dismiss-alert" id="dismissAlert" aria-label="Dismiss alert"><i
-                                    class="fa-solid fa-xmark"></i></button>
+                        <div class="hero-mid">
+                            <i class="fa-solid fa-cloud-sun weather-icon" id="currentIcon"></i>
+                            <div class="temp-block">
+                                <span class="temp-big mono" id="currentTemp">--°</span>
+                                <div class="temp-meta">
+                                    <span id="currentCondition">—</span>
+                                    <span id="feelsLike" class="muted">Feels like --°</span>
+                                </div>
+                            </div>
+                            <div class="hero-astro only-desktop">
+                                <div><i class="fa-solid fa-sun"></i> Sunrise <strong id="sunriseTimeHero">--:--</strong>
+                                </div>
+                                <div><i class="fa-solid fa-sun"></i> Sunset <strong id="sunsetTimeHero">--:--</strong>
+                                </div>
+                                <div><i class="fa-solid fa-circle-half-stroke"></i> Solar Noon <strong
+                                        id="solarNoonTimeHero">--:--</strong></div>
+                                <div><i class="fa-solid fa-hourglass-half"></i> Day Length <strong
+                                        id="dayLengthHero">--</strong></div>
+                                <div><i class="fa-solid fa-cloud-sun"></i> Golden Hour <strong
+                                        id="goldenPMHero">--</strong></div>
+                            </div>
                         </div>
-                        <h2 id="alertTitle">Severe Weather Alert</h2>
-                        <p id="alertMessage">Thunderstorms with heavy rain expected in your area.</p>
-                        <p class="alert-source">Source: <span id="alertSource">NASA EONET</span></p>
-                        <button class="btn-solid danger" id="alertDetailsBtn">View Details</button>
-                    </article>
-
-                    <article class="card alert-card empty-state" id="noAlertCard">
-                        <i class="fa-solid fa-circle-check"></i>
-                        <h2>No Active Alerts</h2>
-                        <p>Severe weather and natural-event alerts for this location will appear here.</p>
-                    </article>
-                </div>
+                        <div class="stat-grid">
+                            <div class="stat"><i class="fa-solid fa-droplet"></i>
+                                <div><small>Humidity</small><strong id="statHumidity">--%</strong></div>
+                            </div>
+                            <div class="stat"><i class="fa-solid fa-wind"></i>
+                                <div><small>Wind</small><strong id="statWind">-- km/h</strong></div>
+                            </div>
+                            <div class="stat"><i class="fa-solid fa-gauge-high"></i>
+                                <div><small>Pressure</small><strong id="statPressure">-- hPa</strong></div>
+                            </div>
+                            <div class="stat"><i class="fa-solid fa-eye"></i>
+                                <div><small>Visibility</small><strong id="statVisibility">-- km</strong></div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
 
                 <article class="card decor-leaf">
                     <div class="card-head">
@@ -474,7 +452,7 @@
                 </article>
 
                 <div class="grid-two">
-                    <article class="card decor-sun">
+                    <article class="card">
                         <div class="card-head">
                             <h2><i class="fa-solid fa-cloud-sun"></i> Today's Summary</h2>
                         </div>

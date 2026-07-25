@@ -95,8 +95,8 @@ async function fetchOWM(lat, lon) {
 async function fetchOpenMeteo(lat, lon) {
   const url = `${ENDPOINTS.OPEN_METEO}?latitude=${lat}&longitude=${lon}` +
     `&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,surface_pressure,visibility` +
-    `&hourly=temperature_2m,precipitation_probability,weather_code,wind_speed_10m,wind_gusts_10m,wind_direction_10m,relative_humidity_2m,uv_index` +
-    `&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,uv_index_max` +
+    `&hourly=temperature_2m,apparent_temperature,precipitation_probability,weather_code,wind_speed_10m,wind_gusts_10m,wind_direction_10m,relative_humidity_2m,uv_index` +
+    `&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,uv_index_max,apparent_temperature_max,apparent_temperature_min,wind_speed_10m_max` +
     `&timezone=auto&forecast_days=8`;
   const data = await fetchJSON(url);
   return { source: 'open-meteo', data };
@@ -178,12 +178,20 @@ function haversine(lat1, lon1, lat2, lon2) {
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
+function hourKey(dtTxt) {
+  return dtTxt.replace(' ', 'T').slice(0, 13);
+}
+
 function normalizeWeather(owmResult, omResult) {
   const uvByDate = {};
+  const uvByHour = {};
   if (omResult && omResult.status === 'fulfilled') {
     const d = omResult.value.data;
     if (d.daily && d.daily.time && d.daily.uv_index_max) {
       d.daily.time.forEach((t, i) => { uvByDate[t] = d.daily.uv_index_max[i]; });
+    }
+    if (d.hourly && d.hourly.time && d.hourly.uv_index) {
+      d.hourly.time.forEach((t, i) => { uvByHour[hourKey(t)] = d.hourly.uv_index[i]; });
     }
   }
   if (owmResult && owmResult.status === 'fulfilled') {
@@ -191,22 +199,36 @@ function normalizeWeather(owmResult, omResult) {
     const dailyMap = {};
     forecast.list.forEach(item => {
       const day = item.dt_txt.split(' ')[0];
-      if (!dailyMap[day]) dailyMap[day] = { temps: [], pops: [], icons: [] };
+      if (!dailyMap[day]) dailyMap[day] = { temps: [], pops: [], icons: [], winds: [], humidities: [], feels: [], conditions: [] };
       dailyMap[day].temps.push(item.main.temp);
       dailyMap[day].pops.push(item.pop || 0);
       dailyMap[day].icons.push(item.weather[0].id);
+      dailyMap[day].winds.push(item.wind.speed);
+      dailyMap[day].humidities.push(item.main.humidity);
+      dailyMap[day].feels.push(item.main.feels_like);
+      dailyMap[day].conditions.push(item.weather[0].description);
     });
-    const daily = Object.entries(dailyMap).slice(0, 7).map(([date, v]) => ({
-      date, hi: Math.max(...v.temps), lo: Math.min(...v.temps),
-      pop: Math.round(Math.max(...v.pops) * 100),
-      icon: owmCodeToIcon(v.icons[Math.floor(v.icons.length / 2)]),
-      uv: uvByDate[date] ?? null,
-    }));
+    const daily = Object.entries(dailyMap).slice(0, 7).map(([date, v]) => {
+      const mid = Math.floor(v.icons.length / 2);
+      const avg = (arr) => arr.reduce((a, b) => a + b, 0) / arr.length;
+      return {
+        date, hi: Math.max(...v.temps), lo: Math.min(...v.temps),
+        pop: Math.round(Math.max(...v.pops) * 100),
+        icon: owmCodeToIcon(v.icons[mid]),
+        condition: capitalize(v.conditions[mid]),
+        wind: Math.round(avg(v.winds) * 3.6),
+        humidity: Math.round(avg(v.humidities)),
+        feels: v.feels[mid],
+        uv: uvByDate[date] ?? null,
+      };
+    });
     const hourly = forecast.list.slice(0, 8).map(item => ({
       time: item.dt_txt, temp: item.main.temp, pop: Math.round((item.pop || 0) * 100),
       icon: owmCodeToIcon(item.weather[0].id), wind: item.wind.speed,
       gust: item.wind.gust ?? item.wind.speed, dir: item.wind.deg ?? 0,
-      humidity: item.main.humidity,
+      humidity: item.main.humidity, feels: item.main.feels_like,
+      condition: capitalize(item.weather[0].description),
+      uv: uvByHour[hourKey(item.dt_txt)] ?? null,
     }));
     const todayKey = Object.keys(dailyMap)[0];
     return {
@@ -229,13 +251,32 @@ function normalizeWeather(owmResult, omResult) {
       gust: d.hourly.wind_gusts_10m ? d.hourly.wind_gusts_10m[i] : d.hourly.wind_speed_10m[i],
       dir: d.hourly.wind_direction_10m ? d.hourly.wind_direction_10m[i] : 0,
       humidity: d.hourly.relative_humidity_2m ? d.hourly.relative_humidity_2m[i] : null,
+      feels: d.hourly.apparent_temperature ? d.hourly.apparent_temperature[i] : null,
+      condition: wmoLabel(d.hourly.weather_code[i]),
+      uv: d.hourly.uv_index ? d.hourly.uv_index[i] : null,
     }));
-    const daily = d.daily.time.slice(0, 7).map((date, i) => ({
-      date, hi: d.daily.temperature_2m_max[i], lo: d.daily.temperature_2m_min[i],
-      pop: d.daily.precipitation_probability_max[i] || 0,
-      icon: wmoIcon(d.daily.weather_code[i]),
-      uv: d.daily.uv_index_max ? d.daily.uv_index_max[i] : null,
-    }));
+    const humidityByDay = {};
+    if (d.hourly.relative_humidity_2m) {
+      d.hourly.time.forEach((t, i) => {
+        const day = t.slice(0, 10);
+        (humidityByDay[day] = humidityByDay[day] || []).push(d.hourly.relative_humidity_2m[i]);
+      });
+    }
+    const daily = d.daily.time.slice(0, 7).map((date, i) => {
+      const hArr = humidityByDay[date];
+      return {
+        date, hi: d.daily.temperature_2m_max[i], lo: d.daily.temperature_2m_min[i],
+        pop: d.daily.precipitation_probability_max[i] || 0,
+        icon: wmoIcon(d.daily.weather_code[i]),
+        condition: wmoLabel(d.daily.weather_code[i]),
+        wind: d.daily.wind_speed_10m_max ? Math.round(d.daily.wind_speed_10m_max[i]) : null,
+        humidity: hArr ? Math.round(hArr.reduce((a, b) => a + b, 0) / hArr.length) : null,
+        feels: (d.daily.apparent_temperature_max && d.daily.apparent_temperature_min)
+          ? (d.daily.apparent_temperature_max[i] + d.daily.apparent_temperature_min[i]) / 2
+          : null,
+        uv: d.daily.uv_index_max ? d.daily.uv_index_max[i] : null,
+      };
+    });
     return {
       source: 'Open-Meteo (fallback — add an OpenWeatherMap key for primary source)',
       current: {
@@ -299,11 +340,19 @@ function renderHourly() {
   const html = w.hourly.map(h => {
     const d = new Date(h.time);
     const label = d.toLocaleTimeString('en-US', { hour: 'numeric' });
+    const uvChip = h.uv != null ? `<span class="uv-badge hour-uv ${uvBand(h.uv).cls}">UV ${Math.round(h.uv)}</span>` : '';
     return `<div class="hour-card">
       <span class="hour-label">${label}</span>
       <i class="fa-solid ${h.icon}"></i>
       <span class="hour-temp mono">${fmtTemp(h.temp)}</span>
-      <span class="hour-pop"><i class="fa-solid fa-droplet"></i>${Math.round(h.pop)}%</span>
+      <span class="hour-condition">${h.condition ? capitalize(h.condition) : '—'}</span>
+      <span class="hour-feels">Feels ${fmtTemp(h.feels)}</span>
+      <div class="hour-meta">
+        <span><i class="fa-solid fa-droplet"></i>${Math.round(h.pop)}%</span>
+        <span><i class="fa-solid fa-wind"></i>${Math.round(h.wind)}</span>
+        <span><i class="fa-solid fa-water"></i>${h.humidity != null ? Math.round(h.humidity) + '%' : '--'}</span>
+      </div>
+      ${uvChip}
     </div>`;
   }).join('');
   $('hourlyScroll').innerHTML = html;
@@ -317,11 +366,21 @@ function renderDaily() {
     const date = new Date(d.date);
     const label = i === 0 ? 'Today' : date.toLocaleDateString('en-US', { weekday: 'short' });
     const sub = date.toLocaleDateString('en-US', { day: '2-digit', month: 'short' });
+    const uvChip = d.uv != null ? `<span class="uv-badge day-uv ${uvBand(d.uv).cls}">UV ${Math.round(d.uv)}</span>` : '';
     return `<li class="daily-row">
-      <span class="day-label">${label}<small>${sub}</small></span>
-      <i class="fa-solid ${d.icon}"></i>
-      <span class="day-pop"><i class="fa-solid fa-droplet"></i> ${Math.round(d.pop)}%</span>
-      <span class="day-temps">${fmtTemp(d.hi)}<span class="lo">${fmtTemp(d.lo)}</span></span>
+      <div class="day-row-top">
+        <span class="day-label">${label}<small>${sub}</small></span>
+        <i class="fa-solid ${d.icon}"></i>
+        <span class="day-pop"><i class="fa-solid fa-droplet"></i> ${Math.round(d.pop)}%</span>
+        <span class="day-temps">${fmtTemp(d.hi)}<span class="lo">${fmtTemp(d.lo)}</span></span>
+      </div>
+      <div class="day-meta">
+        <span class="day-condition">${d.condition ? capitalize(d.condition) : '—'}</span>
+        <span><i class="fa-solid fa-temperature-half"></i>Feels ${fmtTemp(d.feels)}</span>
+        <span><i class="fa-solid fa-wind"></i>${d.wind != null ? d.wind + ' km/h' : '--'}</span>
+        <span><i class="fa-solid fa-water"></i>${d.humidity != null ? d.humidity + '%' : '--'}</span>
+        ${uvChip}
+      </div>
     </li>`;
   }).join('');
   $('dailyList').innerHTML = rows;
@@ -585,21 +644,6 @@ function eonetIcon(catId) {
   return map[catId] || 'fa-triangle-exclamation';
 }
 
-function renderAlertBanner() {
-  const nearby = state.events.find(e => e.distance <= LIMITS.ALERT_RADIUS_KM);
-  if (nearby) {
-    $('alertCard').hidden = false;
-    $('noAlertCard').style.display = 'none';
-    $('alertTitle').textContent = nearby.title;
-    $('alertMessage').textContent = `${nearby.categories[0]?.title || 'Active event'} reported within ${LIMITS.ALERT_RADIUS_KM}km of your location.`;
-    $('alertSource').textContent = 'NASA EONET';
-    $('alertDetailsBtn').onclick = () => openNotifications();
-  } else {
-    $('alertCard').hidden = true;
-    $('noAlertCard').style.display = 'flex';
-  }
-}
-
 let heroActiveLayer = 'A';
 function setHeroBackground(bgImageCss) {
   const a = $('heroBgA'), b = $('heroBgB');
@@ -692,7 +736,7 @@ async function loadCity(lat, lon, name, country) {
         .sort((a, b) => a.distance - b.distance)
         .slice(0, LIMITS.EVENT_LIMIT);
       state.events = near;
-      if (myToken === loadToken) { renderEvents(); renderAlertBanner(); }
+      if (myToken === loadToken) { renderEvents(); }
     } catch (e) { console.warn('EONET unavailable', e); }
   })();
 }
@@ -881,8 +925,6 @@ function init() {
   qsa('.seg-btn').forEach(b => b.addEventListener('click', () => setUnit(b.dataset.unit)));
 
   ['favBtnMobile', 'favBtnDesktop'].forEach(id => $(id).addEventListener('click', toggleFavorite));
-  $('dismissAlert').addEventListener('click', () => { $('alertCard').hidden = true; });
-
   $('shareBtn').addEventListener('click', shareWeather);
 
   $('notifSwitch').addEventListener('click', () => {
