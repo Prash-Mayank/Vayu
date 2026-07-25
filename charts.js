@@ -16,7 +16,7 @@
       grid: cssVar('--card-border', 'rgba(255,255,255,0.09)'),
       good: cssVar('--good', '#22c55e'),
       moderate: cssVar('--moderate', '#eab308'),
-      unhealthy: cssVar('--unhealthy', '#f97316'),
+      unhealthy: cssVar('--unhealthy', '#ef4444'),
     };
   }
 
@@ -64,14 +64,12 @@
       },
     }, extra || {});
   }
-  let tempTrendChart = null;
-  let precipChart = null;
-  let windChart = null;
-  let aqiTrendChart = null;
+
+  const charts = {};
 
   function destroyAll() {
-    [tempTrendChart, precipChart, windChart, aqiTrendChart].forEach((c) => c && c.destroy());
-    tempTrendChart = precipChart = windChart = aqiTrendChart = null;
+    Object.values(charts).forEach((c) => c && c.destroy());
+    Object.keys(charts).forEach((k) => delete charts[k]);
   }
 
   function hourLabel(timeStr) {
@@ -83,17 +81,20 @@
     if (c === null || c === undefined || isNaN(c)) return null;
     return unit === 'F' ? Math.round((c * 9) / 5 + 32) : Math.round(c);
   }
-  function renderTempTrend(canvas, hourly, unit, t) {
+
+  function renderTempTrend(canvasId, hourly, unit, t) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
     const labels = hourly.map((h) => hourLabel(h.time));
     const data = hourly.map((h) => unitTemp(h.temp, unit));
 
-    if (tempTrendChart) { tempTrendChart.destroy(); }
+    if (charts[canvasId]) charts[canvasId].destroy();
     const ctx = canvas.getContext('2d');
     const gradient = ctx.createLinearGradient(0, 0, 0, canvas.clientHeight || 220);
     gradient.addColorStop(0, hexToRGBA(t.accent2, 0.35));
     gradient.addColorStop(1, hexToRGBA(t.accent2, 0.02));
 
-    tempTrendChart = new Chart(ctx, {
+    charts[canvasId] = new Chart(ctx, {
       type: 'line',
       data: {
         labels,
@@ -121,35 +122,31 @@
             bodyColor: t.text2,
             padding: 10,
             displayColors: false,
-            callbacks: {
-              label: (ctx2) => `${ctx2.parsed.y}°${unit}`,
-            },
+            callbacks: { label: (ctx2) => `${ctx2.parsed.y}°${unit}` },
           },
         },
         scales: {
           x: { ticks: { color: t.text2, font: { size: 11 } }, grid: { color: 'transparent' } },
-          y: {
-            ticks: { color: t.text2, font: { size: 11 }, callback: (v) => v + '°' },
-            grid: { color: t.grid },
-          },
+          y: { ticks: { color: t.text2, font: { size: 11 }, callback: (v) => v + '°' }, grid: { color: t.grid } },
         },
       }),
     });
   }
-  function renderPrecip(canvas, hourly, t) {
+
+  function renderPrecip(canvasId, hourly, t) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
     const labels = hourly.map((h) => hourLabel(h.time));
     const data = hourly.map((h) => h.pop ?? 0);
 
-    if (precipChart) { precipChart.destroy(); }
-    precipChart = new Chart(canvas.getContext('2d'), {
+    if (charts[canvasId]) charts[canvasId].destroy();
+    charts[canvasId] = new Chart(canvas.getContext('2d'), {
       type: 'bar',
       data: {
         labels,
         datasets: [{
           data,
-          backgroundColor: data.map((v) =>
-            v >= 60 ? t.unhealthy : v >= 30 ? t.moderate : hexToRGBA(t.accent2, 0.7)
-          ),
+          backgroundColor: data.map((v) => v >= 60 ? t.unhealthy : v >= 30 ? t.moderate : hexToRGBA(t.accent2, 0.7)),
           borderRadius: 6,
           maxBarThickness: 26,
         }],
@@ -170,32 +167,31 @@
         },
         scales: {
           x: { ticks: { color: t.text2, font: { size: 11 } }, grid: { color: 'transparent' } },
-          y: {
-            min: 0, max: 100,
-            ticks: { color: t.text2, font: { size: 11 }, stepSize: 25, callback: (v) => v + '%' },
-            grid: { color: t.grid },
-          },
+          y: { min: 0, max: 100, ticks: { color: t.text2, font: { size: 11 }, stepSize: 25, callback: (v) => v + '%' }, grid: { color: t.grid } },
         },
       }),
     });
   }
-  function renderWind(canvas, hourly, t) {
-    const labels = hourly.map((h) => hourLabel(h.time));
-    const data = hourly.map((h) => Math.round(h.wind ?? 0));
 
-    if (windChart) { windChart.destroy(); }
-    windChart = new Chart(canvas.getContext('2d'), {
+  function renderWindGust(canvasId, hourly, t) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+    const labels = hourly.map((h) => hourLabel(h.time));
+    const data = hourly.map((h) => Math.round(h.gust ?? h.wind ?? 0));
+
+    if (charts[canvasId]) charts[canvasId].destroy();
+    charts[canvasId] = new Chart(canvas.getContext('2d'), {
       type: 'line',
       data: {
         labels,
         datasets: [{
           data,
-          borderColor: t.accent2,
+          borderColor: '#a855f7',
           backgroundColor: 'transparent',
           borderWidth: 2,
-          pointRadius: 0,
-          pointHoverRadius: 4,
-          pointHoverBackgroundColor: t.accent2,
+          pointRadius: 3,
+          pointHoverRadius: 5,
+          pointBackgroundColor: '#a855f7',
           tension: 0.35,
           fill: false,
         }],
@@ -214,23 +210,66 @@
             callbacks: { label: (ctx2) => `${ctx2.parsed.y} km/h` },
           },
         },
+      }),
+    });
+  }
+
+  function renderHumidity(canvasId, hourly, t) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+    const labels = hourly.map((h) => hourLabel(h.time));
+    const data = hourly.map((h) => Math.round(h.humidity ?? 0));
+
+    if (charts[canvasId]) charts[canvasId].destroy();
+    charts[canvasId] = new Chart(canvas.getContext('2d'), {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [{
+          data,
+          borderColor: t.accent2,
+          backgroundColor: hexToRGBA(t.accent2, 0.12),
+          borderWidth: 2,
+          pointRadius: 3,
+          pointHoverRadius: 5,
+          pointBackgroundColor: t.accent2,
+          tension: 0.35,
+          fill: true,
+        }],
+      },
+      options: baseOptions(t, {
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: 'rgba(10,18,32,0.92)',
+            borderColor: t.grid,
+            borderWidth: 1,
+            titleColor: t.text1,
+            bodyColor: t.text2,
+            padding: 10,
+            displayColors: false,
+            callbacks: { label: (ctx2) => `${ctx2.parsed.y}%` },
+          },
+        },
         scales: {
-          x: { display: false, grid: { display: false } },
-          y: { display: false, grid: { display: false } },
+          x: { ticks: { color: t.text2, font: { size: 11 } }, grid: { color: 'transparent' } },
+          y: { min: 0, max: 100, ticks: { color: t.text2, font: { size: 11 }, callback: (v) => v + '%' }, grid: { color: t.grid } },
         },
       }),
     });
   }
 
-  function renderAqiTrend(canvas, hourly, currentAqi, t) {
+  function renderAqiTrend(canvasId, hourly, currentAqi, t) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
     const labels = hourly.map((h) => hourLabel(h.time));
     const temps = hourly.map((h) => h.temp ?? 0);
     const minT = Math.min(...temps), maxT = Math.max(...temps);
     const range = maxT - minT || 1;
     const base = currentAqi ?? 50;
     const data = temps.map((tmp) => {
-      const norm = (tmp - minT) / range; 
-      const wobble = (norm - 0.5) * 0.6; 
+      const norm = (tmp - minT) / range;
+      const wobble = (norm - 0.5) * 0.6;
       return Math.max(5, Math.round(base * (1 + wobble)));
     });
 
@@ -240,17 +279,12 @@
       return t.unhealthy;
     }
 
-    if (aqiTrendChart) { aqiTrendChart.destroy(); }
-    aqiTrendChart = new Chart(canvas.getContext('2d'), {
+    if (charts[canvasId]) charts[canvasId].destroy();
+    charts[canvasId] = new Chart(canvas.getContext('2d'), {
       type: 'bar',
       data: {
         labels,
-        datasets: [{
-          data,
-          backgroundColor: data.map(bandColor),
-          borderRadius: 6,
-          maxBarThickness: 26,
-        }],
+        datasets: [{ data, backgroundColor: data.map(bandColor), borderRadius: 6, maxBarThickness: 26 }],
       },
       options: baseOptions(t, {
         plugins: {
@@ -285,16 +319,14 @@
     const t = theme();
     const unit = state.unit || 'C';
 
-    const tempCanvas = document.getElementById('tempTrendChart');
-    const precipCanvas = document.getElementById('precipChart');
-    const windCanvas = document.getElementById('windChart');
-    const aqiCanvas = document.getElementById('aqiTrendChart');
-
-    if (tempCanvas) renderTempTrend(tempCanvas, w.hourly, unit, t);
-    if (precipCanvas) renderPrecip(precipCanvas, w.hourly, t);
-    if (windCanvas) renderWind(windCanvas, w.hourly, t);
-    if (aqiCanvas) renderAqiTrend(aqiCanvas, w.hourly, state.aqi ? state.aqi.aqi : null, t);
+    renderTempTrend('tempTrendChart', w.hourly, unit, t);
+    renderTempTrend('tempTrendChartForecast', w.hourly, unit, t);
+    renderPrecip('precipChart', w.hourly, t);
+    renderWindGust('windChart', w.hourly, t);
+    renderHumidity('humidityChart', w.hourly, t);
+    renderAqiTrend('aqiTrendChart', w.hourly, state.aqi ? state.aqi.aqi : null, t);
   }
+
   function refreshTheme() {
     if (window.__vayuLastState) updateCharts(window.__vayuLastState);
   }
@@ -306,12 +338,12 @@
   };
   window.VAYU.refreshChartTheme = refreshTheme;
   window.VAYU._destroyCharts = destroyAll;
-
   window.VAYU.resizeCharts = function () {
-    [tempTrendChart, precipChart, windChart, aqiTrendChart].forEach((c) => c && c.resize());
+    Object.values(charts).forEach((c) => c && c.resize());
   };
+
   document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.switch, #themeToggleTop').forEach((el) => {
+    document.querySelectorAll('.switch, #themeToggleDesktop').forEach((el) => {
       el.addEventListener('click', () => setTimeout(refreshTheme, 50));
     });
   });

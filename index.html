@@ -17,7 +17,6 @@
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -32,18 +31,11 @@
                 <span class="brand-tag only-desktop">Weather Intelligence</span>
             </div>
         </div>
-        <div class="topbar-actions only-desktop">
-            <button class="icon-btn" id="favBtn" aria-label="Favourites"><i class="fa-regular fa-star"></i></button>
-            <button class="icon-btn has-dot" id="alertBellBtn" aria-label="Notifications"><i
-                    class="fa-regular fa-bell"></i></button>
-            <button class="icon-btn" id="themeToggleTop" aria-label="Toggle theme"><i
-                    class="fa-solid fa-circle-half-stroke"></i></button>
-        </div>
         <div class="topbar-actions only-mobile">
             <button class="icon-btn" id="favBtnMobile" aria-label="Favourites"><i
                     class="fa-regular fa-star"></i></button>
-            <button class="icon-btn has-dot" id="alertBellBtnMobile" aria-label="Notifications"><i
-                    class="fa-regular fa-bell"></i></button>
+            <button class="icon-btn" id="alertBellBtnMobile" aria-label="Notifications"><i
+                    class="fa-regular fa-bell"></i><span class="bell-dot" hidden></span></button>
             <button class="icon-btn" id="moreMenuBtn" aria-label="More options"><i
                     class="fa-solid fa-ellipsis-vertical"></i></button>
         </div>
@@ -68,12 +60,8 @@
                             Quality</span></button></li>
                 <li><button class="nav-link" data-view="astronomy"><i
                             class="fa-solid fa-moon"></i><span>Astronomy</span></button></li>
-                <li><button class="nav-link" data-view="alerts"><i
-                            class="fa-solid fa-triangle-exclamation"></i><span>Alerts</span></button></li>
                 <li><button class="nav-link" data-view="compare"><i class="fa-solid fa-scale-balanced"></i><span>Compare
                             Cities</span></button></li>
-                <li><button class="nav-link" data-view="maps"><i class="fa-solid fa-map"></i><span>Maps</span></button>
-                </li>
                 <li><button class="nav-link" data-view="favourites"><i
                             class="fa-solid fa-heart"></i><span>Favourites</span></button></li>
                 <li><button class="nav-link" data-view="recent"><i
@@ -116,8 +104,6 @@
                             Quality</span></button></li>
                 <li><button class="nav-link" data-view="astronomy"><i
                             class="fa-solid fa-moon"></i><span>Astronomy</span></button></li>
-                <li><button class="nav-link" data-view="alerts"><i
-                            class="fa-solid fa-triangle-exclamation"></i><span>Alerts</span></button></li>
                 <li><button class="nav-link" data-view="compare"><i class="fa-solid fa-scale-balanced"></i><span>Compare
                             Cities</span></button></li>
                 <li><button class="nav-link" data-view="favourites"><i
@@ -136,6 +122,19 @@
                 <span><i class="fa-solid fa-moon"></i></span>
             </div>
         </nav>
+
+        <div class="notif-overlay" id="notifOverlay"></div>
+        <div class="notif-panel" id="notifPanel" aria-label="Notifications">
+            <div class="notif-panel-head">
+                <h3><i class="fa-solid fa-bell"></i> Notifications</h3>
+                <button class="icon-btn tiny" id="notifCloseBtn" aria-label="Close notifications"><i
+                        class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="notif-panel-body" id="notifPanelBody">
+                <div class="empty-row muted">No active alerts or events near this location.</div>
+            </div>
+        </div>
+
         <main class="main" id="mainContent">
 
             <div class="search-row">
@@ -149,9 +148,17 @@
                 <div id="searchSuggestions" class="suggestions" hidden></div>
                 <button class="btn-outline" id="compareToggleBtn"><i class="fa-solid fa-scale-balanced"></i><span
                         class="compare-label">&nbsp;Compare</span></button>
+                <div class="topbar-actions only-desktop">
+                    <button class="icon-btn" id="favBtnDesktop" aria-label="Favourites"><i
+                            class="fa-regular fa-star"></i></button>
+                    <button class="icon-btn" id="alertBellBtnDesktop" aria-label="Notifications"><i
+                            class="fa-regular fa-bell"></i><span class="bell-dot" hidden></span></button>
+                    <button class="icon-btn" id="themeToggleDesktop" aria-label="Toggle theme"><i
+                            class="fa-solid fa-circle-half-stroke"></i></button>
+                </div>
             </div>
-            <section class="view active" id="view-dashboard">
 
+            <section class="view active" id="view-dashboard">
                 <div class="grid-top">
                     <article class="card hero-card" id="heroCard">
                         <div class="hero-bg is-active" id="heroBgA"
@@ -182,6 +189,18 @@
                                         <span id="currentCondition">—</span>
                                         <span id="feelsLike" class="muted">Feels like --°</span>
                                     </div>
+                                </div>
+                                <div class="hero-astro only-desktop">
+                                    <div><i class="fa-solid fa-sun"></i> Sunrise <strong
+                                            id="sunriseTimeHero">--:--</strong></div>
+                                    <div><i class="fa-solid fa-sun"></i> Sunset <strong
+                                            id="sunsetTimeHero">--:--</strong></div>
+                                    <div><i class="fa-solid fa-circle-half-stroke"></i> Solar Noon <strong
+                                            id="solarNoonTimeHero">--:--</strong></div>
+                                    <div><i class="fa-solid fa-hourglass-half"></i> Day Length <strong
+                                            id="dayLengthHero">--</strong></div>
+                                    <div><i class="fa-solid fa-cloud-sun"></i> Golden Hour <strong
+                                            id="goldenPMHero">--</strong></div>
                                 </div>
                             </div>
                             <div class="stat-grid">
@@ -225,38 +244,40 @@
                     <div class="card-head">
                         <h2><i class="fa-solid fa-wind"></i> Air Quality Index <span class="muted small">(IQAir)</span>
                         </h2>
-                        <span class="pill good" id="aqiBadge">—</span>
+                        <span class="pill aqi-badge good">—</span>
                     </div>
                     <div class="aqi-main">
-                        <span class="aqi-number mono" id="aqiValue">--</span>
+                        <span class="aqi-number mono">--</span>
                         <span class="muted">AQI (US)</span>
                     </div>
                     <div class="aqi-scale">
                         <div class="aqi-scale-track">
-                            <div class="aqi-scale-dot" id="aqiDot"></div>
+                            <div class="aqi-scale-dot"></div>
                         </div>
                         <div class="aqi-scale-labels">
                             <span>0</span><span>50</span><span>100</span><span>150</span><span>200</span><span>300</span><span>500</span>
                         </div>
                     </div>
-                    <div class="pollutant-grid" id="pollutantGrid">
-                        <div class="pollutant"><small>PM2.5</small><strong id="pm25">--</strong><small
+                    <div class="pollutant-grid">
+                        <div class="pollutant"><small>PM2.5</small><strong class="pm25">--</strong><small
                                 class="muted">µg/m³</small></div>
-                        <div class="pollutant"><small>PM10</small><strong id="pm10">--</strong><small
+                        <div class="pollutant"><small>PM10</small><strong class="pm10">--</strong><small
                                 class="muted">µg/m³</small></div>
-                        <div class="pollutant"><small>O₃</small><strong id="o3">--</strong><small
+                        <div class="pollutant"><small>O₃</small><strong class="o3">--</strong><small
                                 class="muted">ppb</small></div>
-                        <div class="pollutant"><small>NO₂</small><strong id="no2">--</strong><small
+                        <div class="pollutant"><small>NO₂</small><strong class="no2">--</strong><small
                                 class="muted">ppb</small></div>
-                        <div class="pollutant"><small>SO₂</small><strong id="so2">--</strong><small
+                        <div class="pollutant"><small>SO₂</small><strong class="so2">--</strong><small
                                 class="muted">ppb</small></div>
-                        <div class="pollutant"><small>CO</small><strong id="co">--</strong><small
+                        <div class="pollutant"><small>CO</small><strong class="co">--</strong><small
                                 class="muted">ppm</small></div>
                     </div>
-                    <p class="advisory"><i class="fa-solid fa-circle-info"></i> <span id="healthAdvisory">Air quality
-                            data will appear once a city is loaded.</span></p>
+                    <p class="advisory"><i class="fa-solid fa-circle-info"></i> <span class="health-advisory">Air
+                            quality data will appear once a city is loaded.</span></p>
                     <p class="no-key-note" id="iqairKeyNote" hidden><i class="fa-solid fa-key"></i> Add your IQAir API
                         key in <code>config.js</code> to see live pollutant data — see README.</p>
+                    <button class="btn-link" data-view="airquality">View Full Report <i
+                            class="fa-solid fa-arrow-right"></i></button>
                 </article>
 
                 <article class="card">
@@ -280,22 +301,6 @@
                                     class="muted small">(24h)</span></h2>
                         </div>
                         <div class="chart-wrap"><canvas id="tempTrendChart"></canvas></div>
-                    </article>
-                </div>
-
-                <div class="grid-two">
-                    <article class="card">
-                        <div class="card-head">
-                            <h2><i class="fa-solid fa-cloud-rain"></i> Precipitation Chance</h2>
-                        </div>
-                        <div class="chart-wrap"><canvas id="precipChart"></canvas></div>
-                    </article>
-
-                    <article class="card">
-                        <div class="card-head">
-                            <h2><i class="fa-solid fa-wind"></i> Hourly Wind Speed</h2>
-                        </div>
-                        <div class="chart-wrap"><canvas id="windChart"></canvas></div>
                     </article>
                 </div>
 
@@ -325,21 +330,108 @@
                     </div>
                 </article>
 
-                <p class="photo-credit" id="photoCredit" hidden>Photo by <a id="photoCreditLink" href="#"
-                        target="_blank" rel="noopener">Unsplash</a> on <a href="https://unsplash.com" target="_blank"
-                        rel="noopener">Unsplash</a></p>
-
+                <footer class="app-footer">Developed by <strong>Mayank Prashar</strong></footer>
             </section>
+
             <section class="view" id="view-airquality">
                 <article class="card">
                     <div class="card-head">
-                        <h2><i class="fa-solid fa-wind"></i> Air Quality — Full Report</h2>
+                        <h2><i class="fa-solid fa-wind"></i> Air Quality <span class="muted small">(IQAir)</span></h2>
+                        <span class="muted small" id="aqiCityLabel">your city</span>
                     </div>
-                    <p class="muted">Detailed pollutant breakdown and historical trend for <span id="aqiCityLabel">your
-                            city</span>.</p>
+                    <div class="aqi-detail-grid">
+                        <div class="aqi-detail-main">
+                            <div class="aqi-main">
+                                <span class="aqi-number mono">--</span>
+                                <span class="muted">AQI (US)</span>
+                                <span class="pill aqi-badge good">—</span>
+                            </div>
+                            <div class="aqi-scale">
+                                <div class="aqi-scale-track">
+                                    <div class="aqi-scale-dot"></div>
+                                </div>
+                                <div class="aqi-scale-labels">
+                                    <span>0</span><span>50</span><span>100</span><span>150</span><span>200</span><span>300</span><span>500</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="aqi-detail-side">
+                            <i class="fa-solid fa-leaf"></i>
+                            <p class="health-advisory">Air quality data will appear once a city is loaded.</p>
+                        </div>
+                    </div>
+                </article>
+
+                <div class="grid-two">
+                    <article class="card">
+                        <div class="card-head">
+                            <h2>Pollutant Breakdown</h2>
+                        </div>
+                        <div class="pollutant-grid">
+                            <div class="pollutant"><small>PM2.5</small><strong class="pm25">--</strong><small
+                                    class="muted">µg/m³</small></div>
+                            <div class="pollutant"><small>PM10</small><strong class="pm10">--</strong><small
+                                    class="muted">µg/m³</small></div>
+                            <div class="pollutant"><small>O₃</small><strong class="o3">--</strong><small
+                                    class="muted">ppb</small></div>
+                            <div class="pollutant"><small>NO₂</small><strong class="no2">--</strong><small
+                                    class="muted">ppb</small></div>
+                            <div class="pollutant"><small>SO₂</small><strong class="so2">--</strong><small
+                                    class="muted">ppb</small></div>
+                            <div class="pollutant"><small>CO</small><strong class="co">--</strong><small
+                                    class="muted">ppm</small></div>
+                        </div>
+                        <p class="no-key-note" hidden><i class="fa-solid fa-key"></i> Add your IQAir API key in
+                            <code>config.js</code> to see live pollutant data.</p>
+                    </article>
+                    <article class="card">
+                        <div class="card-head">
+                            <h2>AQI Scale Guide (US)</h2>
+                        </div>
+                        <div class="scale-guide">
+                            <div class="scale-swatch band-good"><strong>0-50</strong><span>Good</span></div>
+                            <div class="scale-swatch band-moderate"><strong>51-100</strong><span>Moderate</span></div>
+                            <div class="scale-swatch band-usg"><strong>101-150</strong><span>Unhealthy for Sensitive
+                                    Groups</span></div>
+                            <div class="scale-swatch band-unhealthy"><strong>151-200</strong><span>Unhealthy</span>
+                            </div>
+                            <div class="scale-swatch band-veryunhealthy"><strong>201-300</strong><span>Very
+                                    Unhealthy</span></div>
+                            <div class="scale-swatch band-hazardous"><strong>301+</strong><span>Hazardous</span></div>
+                        </div>
+                    </article>
+                </div>
+
+                <article class="card">
+                    <div class="card-head">
+                        <h2><i class="fa-solid fa-chart-column"></i> AQI Trend <span class="muted small">(24
+                                Hours)</span></h2>
+                    </div>
                     <div class="chart-wrap tall"><canvas id="aqiTrendChart"></canvas></div>
                 </article>
+
+                <div class="grid-two">
+                    <article class="card">
+                        <div class="card-head">
+                            <h2>Health Advisory</h2>
+                        </div>
+                        <p class="advisory"><i class="fa-solid fa-shield-halved"></i> <span class="health-advisory">Air
+                                quality data will appear once a city is loaded.</span></p>
+                    </article>
+                    <article class="card">
+                        <div class="card-head">
+                            <h2>Source Details</h2>
+                        </div>
+                        <div class="aqi-extra-grid">
+                            <div><small>Dominant Pollutant</small><strong id="dominantPollutantName">—</strong><span
+                                    id="dominantPollutantValue" class="muted small">--</span></div>
+                            <div><small>Data Update Frequency</small><strong>Every 1 Hour</strong></div>
+                            <div><small>Data Provider</small><strong id="aqiProvider">IQAir</strong></div>
+                        </div>
+                    </article>
+                </div>
             </section>
+
             <section class="view" id="view-astronomy">
                 <article class="card">
                     <div class="card-head">
@@ -366,32 +458,144 @@
                     <div class="astro-meta-grid">
                         <div><small>UV Index</small><strong id="uvIndex">--</strong></div>
                         <div><small>UV Advisory</small><strong id="uvAdvisory">--</strong></div>
+                        <div><small>Moon Phase</small><strong id="moonPhaseName">--</strong><span
+                                id="moonPhaseIllumination" class="muted small">--</span></div>
                     </div>
                 </article>
             </section>
+
             <section class="view" id="view-forecast">
                 <article class="card">
                     <div class="card-head">
-                        <h2><i class="fa-solid fa-calendar-days"></i> 7-Day Forecast</h2>
+                        <h2><i class="fa-solid fa-calendar-days"></i> 7-Day Forecast Overview</h2>
+                    </div>
+                    <div class="overview-strip" id="dailyOverview"></div>
+                </article>
+
+                <div class="grid-two">
+                    <article class="card">
+                        <div class="card-head">
+                            <h2><i class="fa-solid fa-cloud-sun"></i> Today's Summary</h2>
+                        </div>
+                        <div class="today-summary">
+                            <div class="today-summary-main">
+                                <i class="fa-solid fa-cloud-sun" id="summaryIcon"></i>
+                                <div>
+                                    <span class="today-summary-temp mono" id="summaryTemp">--°</span>
+                                    <span id="summaryCondition">—</span>
+                                    <span class="muted small" id="summaryFeels">Feels like --°</span>
+                                </div>
+                            </div>
+                            <div class="today-summary-stats">
+                                <div><small>Max / Min</small><strong id="summaryHiLo">--° / --°</strong></div>
+                                <div><small>Humidity</small><strong id="summaryHumidity">--%</strong></div>
+                                <div><small>Wind</small><strong id="summaryWind">-- km/h</strong></div>
+                                <div><small>UV Index</small><strong id="summaryUv">--</strong></div>
+                                <div><small>Rain Chance</small><strong id="summaryRain">--%</strong></div>
+                            </div>
+                        </div>
+                    </article>
+                    <article class="card">
+                        <div class="card-head">
+                            <h2><i class="fa-solid fa-clock"></i> 24-Hour Forecast</h2>
+                        </div>
+                        <div class="hourly-scroll" id="hourlyScrollFull"></div>
+                    </article>
+                </div>
+
+                <div class="grid-two">
+                    <article class="card">
+                        <div class="card-head">
+                            <h2><i class="fa-solid fa-chart-line"></i> Temperature Trend <span
+                                    class="muted small">(24h)</span></h2>
+                        </div>
+                        <div class="chart-wrap"><canvas id="tempTrendChartForecast"></canvas></div>
+                    </article>
+                    <article class="card">
+                        <div class="card-head">
+                            <h2><i class="fa-solid fa-cloud-rain"></i> Precipitation Chance <span
+                                    class="muted small">(Next 24h)</span></h2>
+                        </div>
+                        <div class="chart-wrap"><canvas id="precipChart"></canvas></div>
+                    </article>
+                </div>
+
+                <div class="grid-two">
+                    <article class="card">
+                        <div class="card-head">
+                            <h2><i class="fa-solid fa-wind"></i> Wind Forecast <span class="muted small"
+                                    id="windSummary"></span></h2>
+                        </div>
+                        <div class="wind-list" id="windList"></div>
+                    </article>
+                    <article class="card">
+                        <div class="card-head">
+                            <h2><i class="fa-solid fa-wind"></i> Wind Gust <span class="muted small">(km/h)</span></h2>
+                        </div>
+                        <div class="chart-wrap"><canvas id="windChart"></canvas></div>
+                    </article>
+                </div>
+
+                <div class="grid-two">
+                    <article class="card">
+                        <div class="card-head">
+                            <h2><i class="fa-solid fa-droplet"></i> Humidity Forecast</h2>
+                        </div>
+                        <div class="chart-wrap"><canvas id="humidityChart"></canvas></div>
+                    </article>
+                    <article class="card">
+                        <div class="card-head">
+                            <h2><i class="fa-solid fa-sun"></i> UV Index <span class="muted small">(Next 7 Days)</span>
+                            </h2>
+                        </div>
+                        <div class="uv-grid" id="uvGrid"></div>
+                    </article>
+                </div>
+
+                <article class="card">
+                    <div class="card-head">
+                        <h2>7-Day Forecast Details</h2>
                     </div>
                     <ul class="daily-list" id="dailyListFull"></ul>
                 </article>
-                <article class="card">
-                    <div class="card-head">
-                        <h2><i class="fa-solid fa-clock"></i> 24-Hour Forecast</h2>
+
+                <div class="quick-grid">
+                    <div class="quick-card">
+                        <small>Sunrise & Sunset</small>
+                        <div class="quick-sun-row"><i class="fa-solid fa-sun"></i><strong
+                                id="sunriseTimeMini">--:--</strong></div>
+                        <div class="quick-sun-row"><i class="fa-solid fa-sun"></i><strong
+                                id="sunsetTimeMini">--:--</strong></div>
                     </div>
-                    <div class="hourly-scroll" id="hourlyScrollFull"></div>
-                </article>
-            </section>
-            <section class="view" id="view-alerts">
-                <article class="card">
-                    <div class="card-head">
-                        <h2><i class="fa-solid fa-triangle-exclamation"></i> Active Events Near You</h2><span
-                            class="muted small">NASA EONET · 500km radius</span>
+                    <div class="quick-card">
+                        <small>Moon Phase</small>
+                        <i class="fa-solid fa-moon"></i>
+                        <strong id="moonPhaseNameMini">--</strong>
                     </div>
-                    <ul class="event-list" id="eventList"></ul>
-                </article>
+                    <button class="quick-card as-button" data-view="airquality">
+                        <small>Air Quality</small>
+                        <strong id="quickAqiValue">--</strong>
+                        <span id="quickAqiLabel" class="muted">--</span>
+                    </button>
+                    <div class="quick-card">
+                        <small>Pressure</small>
+                        <i class="fa-solid fa-gauge-high"></i>
+                        <strong id="quickPressure">-- hPa</strong>
+                    </div>
+                    <div class="quick-card">
+                        <small>Visibility</small>
+                        <i class="fa-solid fa-eye"></i>
+                        <strong id="quickVisibility">-- km</strong>
+                    </div>
+                    <div class="quick-card">
+                        <small>Pollen Count</small>
+                        <i class="fa-solid fa-seedling"></i>
+                        <strong>N/A</strong>
+                        <span class="muted">Not available yet</span>
+                    </div>
+                </div>
             </section>
+
             <section class="view" id="view-compare">
                 <article class="card">
                     <div class="card-head">
@@ -399,20 +603,16 @@
                     </div>
                     <div class="compare-grid">
                         <div class="compare-col">
-                            <label class="search-box small">
-                                <i class="fa-solid fa-magnifying-glass"></i>
-                                <input type="text" id="compareCityA" placeholder="City A…">
-                            </label>
+                            <label class="search-box small"><i class="fa-solid fa-magnifying-glass"></i><input
+                                    type="text" id="compareCityA" placeholder="City A…"></label>
                             <div class="compare-card" id="compareCardA">
                                 <p class="muted">Search a city to compare.</p>
                             </div>
                         </div>
                         <div class="compare-vs"><i class="fa-solid fa-bolt"></i></div>
                         <div class="compare-col">
-                            <label class="search-box small">
-                                <i class="fa-solid fa-magnifying-glass"></i>
-                                <input type="text" id="compareCityB" placeholder="City B…">
-                            </label>
+                            <label class="search-box small"><i class="fa-solid fa-magnifying-glass"></i><input
+                                    type="text" id="compareCityB" placeholder="City B…"></label>
                             <div class="compare-card" id="compareCardB">
                                 <p class="muted">Search a city to compare.</p>
                             </div>
@@ -420,6 +620,7 @@
                     </div>
                 </article>
             </section>
+
             <section class="view" id="view-favourites">
                 <article class="card">
                     <div class="card-head">
@@ -431,6 +632,7 @@
                     </ul>
                 </article>
             </section>
+
             <section class="view" id="view-recent">
                 <article class="card">
                     <div class="card-head">
@@ -442,19 +644,12 @@
                     </ul>
                 </article>
             </section>
-            <section class="view" id="view-maps">
-                <article class="card empty-state">
-                    <i class="fa-solid fa-map"></i>
-                    <h2>Maps</h2>
-                    <p>Radar and satellite overlays are planned for a future Vayu release.</p>
-                </article>
-            </section>
+
             <section class="view" id="view-settings">
                 <article class="card">
                     <div class="card-head">
                         <h2><i class="fa-solid fa-gear"></i> Settings</h2>
                     </div>
-
                     <div class="settings-row">
                         <div><strong>Temperature Unit</strong>
                             <p class="muted">Choose Celsius or Fahrenheit.</p>
@@ -464,32 +659,32 @@
                             <button class="seg-btn" data-unit="F">°F</button>
                         </div>
                     </div>
-                    <div><strong>Theme</strong>
-                        <p class="muted">Switch between light and dark mode.</p>
+                    <div class="settings-row">
+                        <div><strong>Theme</strong>
+                            <p class="muted">Switch between light and dark mode.</p>
+                        </div>
+                        <button class="switch theme-switch" id="themeSwitchSettings" role="switch" aria-checked="true"
+                            aria-label="Toggle dark mode"><span class="switch-thumb"></span></button>
                     </div>
-                    <button class="switch theme-switch" id="themeSwitchSettings" role="switch" aria-checked="true"
-                        aria-label="Toggle dark mode"><span class="switch-thumb"></span></button>
+                    <div class="settings-row">
+                        <div><strong>Notifications</strong>
+                            <p class="muted">Weather updates and severe alerts.</p>
+                        </div>
+                        <button class="switch" id="notifSwitch" role="switch" aria-checked="false"
+                            aria-label="Toggle notifications"><span class="switch-thumb"></span></button>
+                    </div>
+                    <div class="settings-row">
+                        <div><strong>Install App</strong>
+                            <p class="muted">Add Vayu to your home screen for offline access.</p>
+                        </div>
+                        <button class="btn-outline" id="installBtn" disabled>Install</button>
+                    </div>
+                </article>
+            </section>
+
+        </main>
     </div>
 
-    <div class="settings-row">
-        <div><strong>Notifications</strong>
-            <p class="muted">Weather updates and severe alerts.</p>
-        </div>
-        <button class="switch" id="notifSwitch" role="switch" aria-checked="false"
-            aria-label="Toggle notifications"><span class="switch-thumb"></span></button>
-    </div>
-
-    <div class="settings-row">
-        <div><strong>Install App</strong>
-            <p class="muted">Add Vayu to your home screen for offline access.</p>
-        </div>
-        <button class="btn-outline" id="installBtn" disabled>Install</button>
-    </div>
-    </article>
-    </section>
-
-    </main>
-    </div>
     <nav class="bottom-nav only-mobile" aria-label="Primary">
         <button class="bn-btn active" data-view="dashboard"><i
                 class="fa-solid fa-house"></i><span>Dashboard</span></button>
@@ -503,11 +698,8 @@
     <div class="sheet" id="moreSheet">
         <div class="sheet-handle"></div>
         <ul class="nav-list">
-            <li><button class="nav-link" data-view="alerts"><i
-                        class="fa-solid fa-triangle-exclamation"></i><span>Alerts</span></button></li>
             <li><button class="nav-link" data-view="compare"><i class="fa-solid fa-scale-balanced"></i><span>Compare
                         Cities</span></button></li>
-            <li><button class="nav-link" data-view="maps"><i class="fa-solid fa-map"></i><span>Maps</span></button></li>
             <li><button class="nav-link" data-view="favourites"><i
                         class="fa-solid fa-heart"></i><span>Favourites</span></button></li>
             <li><button class="nav-link" data-view="recent"><i class="fa-solid fa-clock-rotate-left"></i><span>Recent
