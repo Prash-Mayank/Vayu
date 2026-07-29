@@ -38,26 +38,47 @@
                 <a href="#about" class="lp-nav-link">About</a>
                 <a href="home.html" class="lp-nav-link">Dashboard</a>
                 <a href="#download" class="lp-nav-link">Install</a>
-                <button class="btn-solid lp-nav-install" id="installBtnNav" hidden><i class="fa-solid fa-download"></i> Install</button>
+                <button class="btn-solid lp-nav-install" id="installBtnNav" hidden><i class="fa-solid fa-download"></i>
+                    Install</button>
             </nav>
         </div>
     </header>
 
     <main>
         <section class="lp-hero" id="home">
-            <div class="lp-hero-bg"
-                style="background-image:linear-gradient(180deg, rgba(7,13,24,0.6), rgba(7,13,24,0.97)), url('https://images.unsplash.com/photo-1601134467661-3d775b999c8b?auto=format&fit=crop&w=1600&q=60')">
-            </div>
-            <div class="lp-hero-content">
-                <span class="pill good lp-badge"><i class="fa-solid fa-bolt"></i> Multi-API Weather Platform</span>
-                <h1 class="lp-hero-title">Weather Intelligence, <span>Reimagined</span></h1>
-                <p class="lp-hero-desc">Real-time forecasts, live air quality, astronomy and severe-weather alerts — all in one fast, installable app.</p>
-                <div class="lp-hero-actions">
-                    <a class="btn-solid" href="home.html">Get Started <i class="fa-solid fa-arrow-right"></i></a>
-                    <button class="btn-outline" id="installBtnHero" hidden><i class="fa-solid fa-download"></i> Install App</button>
+            <div class="lp-hero-slideshow" id="heroSlideshow">
+                <div class="lp-hero-slide active"
+                    data-bg="https://images.unsplash.com/photo-1601134467661-3d775b999c8b?auto=format&fit=crop&w=1600&q=60">
                 </div>
-                <p class="lp-installed-note" id="installedNote" hidden><i class="fa-solid fa-circle-check"></i> Vayu is already installed on this device.</p>
-                <div class="lp-hero-stats">
+                <div class="lp-hero-slide"
+                    data-bg="https://images.unsplash.com/photo-1500674425229-f692875b0ab7?auto=format&fit=crop&w=1600&q=60">
+                </div>
+                <div class="lp-hero-slide"
+                    data-bg="https://images.unsplash.com/photo-1592210454359-9043f067919b?auto=format&fit=crop&w=1600&q=60">
+                </div>
+                <div class="lp-hero-slide"
+                    data-bg="https://images.unsplash.com/photo-1419833479618-c595710705f2?auto=format&fit=crop&w=1600&q=60">
+                </div>
+                <div class="lp-hero-slide"
+                    data-bg="https://images.unsplash.com/photo-1504608524841-42fe6f032b4b?auto=format&fit=crop&w=1600&q=60">
+                </div>
+            </div>
+            <div class="lp-hero-overlay"></div>
+            <div class="lp-hero-content">
+                <span class="pill good lp-badge hero-in hero-in-1"><i class="fa-solid fa-bolt"></i> Multi-API Weather
+                    Platform</span>
+                <h1 class="lp-hero-title hero-in hero-in-2">Weather Intelligence, <span>Reimagined</span></h1>
+                <p class="lp-hero-desc hero-in hero-in-3">Real-time forecasts, live air quality, astronomy and
+                    severe-weather alerts — all in one fast, installable app.</p>
+                <div class="lp-hero-actions hero-in hero-in-4">
+                    <a class="btn-solid ripple-btn" href="home.html">Get Started <i
+                            class="fa-solid fa-arrow-right"></i></a>
+                    <button class="btn-outline ripple-btn" id="installBtnHero" hidden><i
+                            class="fa-solid fa-download"></i> Install App</button>
+                </div>
+                <p class="lp-installed-note" id="installedNote" hidden><i class="fa-solid fa-circle-check"></i> Vayu is
+                    already installed on this device.</p>
+                <div class="lp-hero-stats hero-in hero-in-5">
                     <div class="lp-stat"><strong>7-Day</strong><small>Forecast</small></div>
                     <div class="lp-stat"><strong>Live</strong><small>Air Quality</small></div>
                     <div class="lp-stat"><strong>Real-Time</strong><small>Disaster Alerts</small></div>
@@ -67,38 +88,35 @@
         </section>
 
         <section class="lp-section" id="features">
-            <div class="lp-section-head">
-                <span class="lp-eyebrow">Features</span>
-                <h2>Everything your sky needs</h2>
-                <p>One dashboard for forecasts, air quality, astronomy and severe-weather alerts, powered by multiple reliable data sources.</p>
-            </div>
             <div class="lp-feature-grid">
-                <article class="card lp-feature-card">
+                <article class="card lp-feature-card reveal-up">
                     <div class="lp-feature-icon"><i class="fa-solid fa-cloud-sun-rain"></i></div>
                     <h3>7-Day Forecast</h3>
-                    <p>Hourly and daily outlooks with feels-like, wind, humidity and UV, powered by dual weather sources for reliability.</p>
+                    <p>Hourly and daily outlooks with feels-like, wind, humidity and UV, powered by dual weather sources
+                        for reliability.</p>
                 </article>
-                <article class="card lp-feature-card">
+                <article class="card lp-feature-card reveal-up">
                     <div class="lp-feature-icon"><i class="fa-solid fa-wind"></i></div>
                     <h3>Live Air Quality</h3>
-                    <p>Real-time AQI, full pollutant breakdown and health advisories sourced from IQAir and Open-Meteo.</p>
+                    <p>Real-time AQI, full pollutant breakdown and health advisories sourced from IQAir and Open-Meteo.
+                    </p>
                 </article>
-                <article class="card lp-feature-card">
+                <article class="card lp-feature-card reveal-up">
                     <div class="lp-feature-icon"><i class="fa-solid fa-moon"></i></div>
                     <h3>Astronomy</h3>
                     <p>Sunrise, sunset, solar noon, golden hour windows and moon phase for any city you search.</p>
                 </article>
-                <article class="card lp-feature-card">
+                <article class="card lp-feature-card reveal-up">
                     <div class="lp-feature-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
                     <h3>Severe Alerts</h3>
                     <p>Nearby natural-event alerts from NASA EONET, surfaced right in your notifications.</p>
                 </article>
-                <article class="card lp-feature-card">
+                <article class="card lp-feature-card reveal-up">
                     <div class="lp-feature-icon"><i class="fa-solid fa-scale-balanced"></i></div>
                     <h3>Compare Cities</h3>
                     <p>Put two cities side by side across temperature, humidity and wind in a single view.</p>
                 </article>
-                <article class="card lp-feature-card">
+                <article class="card lp-feature-card reveal-up">
                     <div class="lp-feature-icon"><i class="fa-solid fa-mobile-screen-button"></i></div>
                     <h3>Installable PWA</h3>
                     <p>Add Vayu to your home screen for an app-like experience with offline shell support.</p>
@@ -107,91 +125,37 @@
         </section>
 
         <section class="lp-section" id="about">
-            <div class="lp-section-head">
-                <span class="lp-eyebrow">Why Choose Vayu</span>
-                <h2>Built to be fast, honest and reliable</h2>
-                <p>No clutter, no dark patterns — just accurate weather intelligence that respects your time and your device.</p>
-            </div>
             <div class="lp-why-grid">
-                <div class="lp-why-item">
+                <div class="lp-why-item reveal-up">
                     <i class="fa-solid fa-layer-group"></i>
                     <div>
                         <h3>Dual-Source Reliability</h3>
-                        <p>Weather and air quality data is cross-checked across multiple providers, with automatic fallbacks so you always see real numbers.</p>
+                        <p>Weather and air quality data is cross-checked across multiple providers, with automatic
+                            fallbacks so you always see real numbers.</p>
                     </div>
                 </div>
-                <div class="lp-why-item">
+                <div class="lp-why-item reveal-up">
                     <i class="fa-solid fa-gauge-high"></i>
                     <div>
                         <h3>Fast & Lightweight</h3>
-                        <p>Built with vanilla JavaScript and no heavy frameworks, so it loads quickly even on slower connections.</p>
+                        <p>Built with vanilla JavaScript and no heavy frameworks, so it loads quickly even on slower
+                            connections.</p>
                     </div>
                 </div>
-                <div class="lp-why-item">
+                <div class="lp-why-item reveal-up">
                     <i class="fa-solid fa-shield-halved"></i>
                     <div>
                         <h3>Privacy-First</h3>
-                        <p>Your favourites, recent searches and preferences stay on your device. No accounts, no tracking.</p>
+                        <p>Your favourites, recent searches and preferences stay on your device. No accounts, no
+                            tracking.</p>
                     </div>
                 </div>
-                <div class="lp-why-item">
+                <div class="lp-why-item reveal-up">
                     <i class="fa-solid fa-download"></i>
                     <div>
                         <h3>Works Offline</h3>
-                        <p>Install Vayu to your home screen and the app shell keeps working even with a patchy connection.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="lp-section" id="forecast-preview">
-            <div class="lp-preview">
-                <div class="lp-preview-copy">
-                    <span class="lp-eyebrow">Forecast Preview</span>
-                    <h2>Hour-by-hour clarity, every day</h2>
-                    <p>Scroll through hourly conditions or scan the full week ahead — temperature, precipitation chance, wind and feels-like are always one glance away.</p>
-                    <ul class="lp-preview-list">
-                        <li><i class="fa-solid fa-circle-check"></i> Hourly and 7-day outlooks</li>
-                        <li><i class="fa-solid fa-circle-check"></i> Feels-like, wind and humidity</li>
-                        <li><i class="fa-solid fa-circle-check"></i> Precipitation probability charts</li>
-                    </ul>
-                    <a class="btn-solid" href="home.html" style="align-self:flex-start;">Open Forecast <i class="fa-solid fa-arrow-right"></i></a>
-                </div>
-                <div class="lp-preview-visual">
-                    <div class="card">
-                        <div class="card-head"><h2><i class="fa-solid fa-cloud-sun-rain"></i> Hourly Forecast</h2></div>
-                        <div class="hourly-scroll">
-                            <div class="hour-card">
-                                <span class="hour-label">Now</span>
-                                <i class="fa-solid fa-sun"></i>
-                                <span class="hour-temp">29°</span>
-                                <span class="hour-condition">Clear sky</span>
-                            </div>
-                            <div class="hour-card">
-                                <span class="hour-label">1 PM</span>
-                                <i class="fa-solid fa-cloud-sun"></i>
-                                <span class="hour-temp">31°</span>
-                                <span class="hour-condition">Partly cloudy</span>
-                            </div>
-                            <div class="hour-card">
-                                <span class="hour-label">2 PM</span>
-                                <i class="fa-solid fa-cloud"></i>
-                                <span class="hour-temp">30°</span>
-                                <span class="hour-condition">Cloudy</span>
-                            </div>
-                            <div class="hour-card">
-                                <span class="hour-label">3 PM</span>
-                                <i class="fa-solid fa-cloud-showers-heavy"></i>
-                                <span class="hour-temp">27°</span>
-                                <span class="hour-condition">Light rain</span>
-                            </div>
-                            <div class="hour-card">
-                                <span class="hour-label">4 PM</span>
-                                <i class="fa-solid fa-cloud-sun"></i>
-                                <span class="hour-temp">28°</span>
-                                <span class="hour-condition">Partly cloudy</span>
-                            </div>
-                        </div>
+                        <p>Install Vayu to your home screen and the app shell keeps working even with a patchy
+                            connection.</p>
                     </div>
                 </div>
             </div>
@@ -199,27 +163,32 @@
 
         <section class="lp-section" id="aqi-preview">
             <div class="lp-preview reverse">
-                <div class="lp-preview-copy">
-                    <span class="lp-eyebrow">Air Quality Preview</span>
+                <div class="lp-preview-copy reveal-left">
                     <h2>Know what you're breathing</h2>
-                    <p>A live US AQI score, full pollutant breakdown and a plain-language health advisory for every city you check.</p>
+                    <p>A live US AQI score, full pollutant breakdown and a plain-language health advisory for every city
+                        you check.</p>
                     <ul class="lp-preview-list">
                         <li><i class="fa-solid fa-circle-check"></i> Real-time AQI with colour bands</li>
                         <li><i class="fa-solid fa-circle-check"></i> PM2.5, PM10, O3, NO2 and more</li>
                         <li><i class="fa-solid fa-circle-check"></i> Health advisories for sensitive groups</li>
                     </ul>
-                    <a class="btn-solid" href="home.html" style="align-self:flex-start;">Open Air Quality <i class="fa-solid fa-arrow-right"></i></a>
+                    <a class="btn-solid ripple-btn lp-preview-cta" href="home.html">Open Air Quality <i
+                            class="fa-solid fa-arrow-right"></i></a>
                 </div>
-                <div class="lp-preview-visual">
+                <div class="lp-preview-visual reveal-right">
                     <div class="card">
-                        <div class="card-head"><h2><i class="fa-solid fa-wind"></i> Air Quality Index</h2></div>
+                        <div class="card-head">
+                            <h2><i class="fa-solid fa-wind"></i> Air Quality Index</h2>
+                        </div>
                         <div class="aqi-detail-side">
                             <i class="fa-solid fa-face-smile"></i>
                             <span class="aqi-number">42</span>
                             <span class="pill good">Good</span>
                         </div>
                         <div class="aqi-scale">
-                            <div class="aqi-scale-track"><div class="aqi-scale-dot" style="left:20%"></div></div>
+                            <div class="aqi-scale-track">
+                                <div class="aqi-scale-dot demo-dot-20"></div>
+                            </div>
                         </div>
                         <div class="scale-guide">
                             <div class="scale-swatch band-good"><strong>Good</strong><span>0-50</span></div>
@@ -233,28 +202,37 @@
 
         <section class="lp-section" id="astro-preview">
             <div class="lp-preview">
-                <div class="lp-preview-copy">
-                    <span class="lp-eyebrow">Astronomy Preview</span>
+                <div class="lp-preview-copy reveal-left">
                     <h2>Golden hour, mapped out</h2>
-                    <p>Track sunrise, solar noon and sunset with a live position marker, plus the current moon phase for any city.</p>
+                    <p>Track sunrise, solar noon and sunset with a live position marker, plus the current moon phase for
+                        any city.</p>
                     <ul class="lp-preview-list">
                         <li><i class="fa-solid fa-circle-check"></i> Sunrise and sunset times</li>
                         <li><i class="fa-solid fa-circle-check"></i> Golden hour windows</li>
                         <li><i class="fa-solid fa-circle-check"></i> Current moon phase</li>
                     </ul>
-                    <a class="btn-solid" href="home.html" style="align-self:flex-start;">Open Astronomy <i class="fa-solid fa-arrow-right"></i></a>
+                    <a class="btn-solid ripple-btn lp-preview-cta" href="home.html">Open Astronomy <i
+                            class="fa-solid fa-arrow-right"></i></a>
                 </div>
-                <div class="lp-preview-visual">
+                <div class="lp-preview-visual reveal-right">
                     <div class="card">
-                        <div class="card-head"><h2><i class="fa-solid fa-moon"></i> Astronomy</h2></div>
+                        <div class="card-head">
+                            <h2><i class="fa-solid fa-moon"></i> Astronomy</h2>
+                        </div>
                         <div class="sun-arc-wrap">
                             <div class="sun-arc">
-                                <div class="sun-marker" style="left:55%; bottom:78%;"><i class="fa-solid fa-sun"></i></div>
+                                <div class="sun-marker demo-sun-pos"><i class="fa-solid fa-sun"></i>
+                                </div>
                             </div>
                             <div class="arc-points">
-                                <div class="arc-point"><i class="fa-solid fa-arrow-up"></i><small>Sunrise</small><strong>6:04 AM</strong></div>
-                                <div class="arc-point"><i class="fa-solid fa-circle"></i><small>Solar Noon</small><strong>12:31 PM</strong></div>
-                                <div class="arc-point"><i class="fa-solid fa-arrow-down"></i><small>Sunset</small><strong>7:02 PM</strong></div>
+                                <div class="arc-point"><i
+                                        class="fa-solid fa-arrow-up"></i><small>Sunrise</small><strong>6:04 AM</strong>
+                                </div>
+                                <div class="arc-point"><i class="fa-solid fa-circle"></i><small>Solar
+                                        Noon</small><strong>12:31 PM</strong></div>
+                                <div class="arc-point"><i
+                                        class="fa-solid fa-arrow-down"></i><small>Sunset</small><strong>7:02 PM</strong>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -264,23 +242,27 @@
 
         <section class="lp-section" id="compare-preview">
             <div class="lp-preview reverse">
-                <div class="lp-preview-copy">
-                    <span class="lp-eyebrow">Compare Cities Preview</span>
+                <div class="lp-preview-copy reveal-left">
                     <h2>Two cities, one view</h2>
-                    <p>Planning a trip or comparing hometowns? Line up temperature, humidity and wind side by side in seconds.</p>
+                    <p>Planning a trip or comparing hometowns? Line up temperature, humidity and wind side by side in
+                        seconds.</p>
                     <ul class="lp-preview-list">
                         <li><i class="fa-solid fa-circle-check"></i> Side-by-side live stats</li>
                         <li><i class="fa-solid fa-circle-check"></i> Highlights the better reading</li>
                         <li><i class="fa-solid fa-circle-check"></i> Works with any two searchable cities</li>
                     </ul>
-                    <a class="btn-solid" href="home.html" style="align-self:flex-start;">Open Compare <i class="fa-solid fa-arrow-right"></i></a>
+                    <a class="btn-solid ripple-btn lp-preview-cta" href="home.html">Open Compare <i
+                            class="fa-solid fa-arrow-right"></i></a>
                 </div>
-                <div class="lp-preview-visual">
+                <div class="lp-preview-visual reveal-right">
                     <div class="card">
-                        <div class="card-head"><h2><i class="fa-solid fa-scale-balanced"></i> Compare Cities</h2></div>
+                        <div class="card-head">
+                            <h2><i class="fa-solid fa-scale-balanced"></i> Compare Cities</h2>
+                        </div>
                         <div class="compare-grid">
                             <div>
-                                <div class="city-row"><i class="fa-solid fa-location-dot"></i><span class="city-row-name">New Delhi</span></div>
+                                <div class="city-row"><i class="fa-solid fa-location-dot"></i><span
+                                        class="city-row-name">New Delhi</span></div>
                                 <div class="compare-card">
                                     <div class="compare-stat"><span>Temp</span><span class="better">31°C</span></div>
                                     <div class="compare-stat"><span>Humidity</span><span class="worse">58%</span></div>
@@ -289,7 +271,8 @@
                             </div>
                             <div class="compare-vs"><i class="fa-solid fa-code-compare"></i></div>
                             <div>
-                                <div class="city-row"><i class="fa-solid fa-location-dot"></i><span class="city-row-name">Mumbai</span></div>
+                                <div class="city-row"><i class="fa-solid fa-location-dot"></i><span
+                                        class="city-row-name">Mumbai</span></div>
                                 <div class="compare-card">
                                     <div class="compare-stat"><span>Temp</span><span class="worse">28°C</span></div>
                                     <div class="compare-stat"><span>Humidity</span><span class="better">72%</span></div>
@@ -303,90 +286,260 @@
         </section>
 
         <section class="lp-section" id="screenshots">
-            <div class="lp-section-head">
-                <span class="lp-eyebrow">App Screenshots</span>
-                <h2>See Vayu in action</h2>
-                <p>A glimpse of the dashboard, air quality panel and astronomy view, all wrapped in the same glass-clean design.</p>
-            </div>
-            <div class="lp-phone-row">
-                <div class="lp-phone-item">
-                    <div class="lp-phone">
-                        <div class="lp-phone-notch"></div>
-                        <div class="lp-phone-screen">
-                            <div class="lp-mini-topbar"><span class="lp-mini-dot"></span><div class="lp-mini-line w40"></div></div>
-                            <div class="lp-mini-card">
-                                <div class="lp-mini-big">29°C</div>
-                                <div class="lp-mini-line w60"></div>
-                                <div class="lp-mini-line w40"></div>
-                            </div>
-                            <div class="lp-mini-row">
-                                <div class="lp-mini-chip"></div>
-                                <div class="lp-mini-chip"></div>
-                                <div class="lp-mini-chip"></div>
-                            </div>
-                            <div class="lp-mini-card">
-                                <div class="lp-mini-line w80"></div>
-                                <div class="lp-mini-line w60"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <strong>Dashboard</strong>
-                </div>
-                <div class="lp-phone-item">
-                    <div class="lp-phone">
-                        <div class="lp-phone-notch"></div>
-                        <div class="lp-phone-screen">
-                            <div class="lp-mini-topbar"><span class="lp-mini-dot"></span><div class="lp-mini-line w40"></div></div>
-                            <div class="lp-mini-card">
-                                <div class="lp-mini-ring"><span>42</span></div>
-                                <div class="lp-mini-line w60" style="align-self:center;"></div>
-                            </div>
-                            <div class="lp-mini-row">
-                                <div class="lp-mini-chip"></div>
-                                <div class="lp-mini-chip"></div>
-                                <div class="lp-mini-chip"></div>
+            <div class="lp-gallery-wrap">
+                <div class="lp-phone-row">
+                    <div class="lp-phone-item reveal-up">
+                        <div class="lp-phone">
+                            <div class="lp-phone-notch"></div>
+                            <div class="lp-phone-screen">
+                                <div class="lp-mini-topbar"><span class="lp-mini-dot"></span>
+                                    <div class="lp-mini-line w40"></div>
+                                </div>
+                                <div class="lp-mini-card">
+                                    <div class="lp-mini-big">29°C</div>
+                                    <div class="lp-mini-line w60"></div>
+                                    <div class="lp-mini-line w40"></div>
+                                </div>
+                                <div class="lp-mini-row">
+                                    <div class="lp-mini-chip"></div>
+                                    <div class="lp-mini-chip"></div>
+                                    <div class="lp-mini-chip"></div>
+                                </div>
+                                <div class="lp-mini-card">
+                                    <div class="lp-mini-line w80"></div>
+                                    <div class="lp-mini-line w60"></div>
+                                </div>
                             </div>
                         </div>
+                        <strong>Dashboard</strong>
                     </div>
-                    <strong>Air Quality</strong>
-                </div>
-                <div class="lp-phone-item">
-                    <div class="lp-phone">
-                        <div class="lp-phone-notch"></div>
-                        <div class="lp-phone-screen">
-                            <div class="lp-mini-topbar"><span class="lp-mini-dot"></span><div class="lp-mini-line w40"></div></div>
-                            <div class="lp-mini-card">
-                                <div class="lp-mini-line w80"></div>
-                                <div class="lp-mini-line w40"></div>
-                            </div>
-                            <div class="lp-mini-row">
-                                <div class="lp-mini-chip"></div>
-                                <div class="lp-mini-chip"></div>
-                            </div>
-                            <div class="lp-mini-card">
-                                <div class="lp-mini-line w60"></div>
-                                <div class="lp-mini-line w60"></div>
+                    <div class="lp-phone-item reveal-up">
+                        <div class="lp-phone">
+                            <div class="lp-phone-notch"></div>
+                            <div class="lp-phone-screen">
+                                <div class="lp-mini-topbar"><span class="lp-mini-dot"></span>
+                                    <div class="lp-mini-line w40"></div>
+                                </div>
+                                <div class="lp-mini-card">
+                                    <div class="lp-mini-ring"><span>42</span></div>
+                                    <div class="lp-mini-line w60 center-self"></div>
+                                </div>
+                                <div class="lp-mini-row">
+                                    <div class="lp-mini-chip"></div>
+                                    <div class="lp-mini-chip"></div>
+                                    <div class="lp-mini-chip"></div>
+                                </div>
                             </div>
                         </div>
+                        <strong>Air Quality</strong>
                     </div>
-                    <strong>Astronomy</strong>
+                    <div class="lp-phone-item reveal-up">
+                        <div class="lp-phone">
+                            <div class="lp-phone-notch"></div>
+                            <div class="lp-phone-screen">
+                                <div class="lp-mini-topbar"><span class="lp-mini-dot"></span>
+                                    <div class="lp-mini-line w40"></div>
+                                </div>
+                                <div class="lp-mini-card">
+                                    <div class="lp-mini-line w80"></div>
+                                    <div class="lp-mini-line w40"></div>
+                                </div>
+                                <div class="lp-mini-row">
+                                    <div class="lp-mini-chip"></div>
+                                    <div class="lp-mini-chip"></div>
+                                </div>
+                                <div class="lp-mini-card">
+                                    <div class="lp-mini-line w60"></div>
+                                    <div class="lp-mini-line w60"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <strong>Astronomy</strong>
+                    </div>
+                    <div class="lp-phone-item reveal-up">
+                        <div class="lp-phone">
+                            <div class="lp-phone-notch"></div>
+                            <div class="lp-phone-screen">
+                                <div class="lp-mini-topbar"><span class="lp-mini-dot"></span>
+                                    <div class="lp-mini-line w40"></div>
+                                </div>
+                                <div class="lp-mini-card">
+                                    <div class="lp-mini-line w80"></div>
+                                    <div class="lp-mini-line w60"></div>
+                                    <div class="lp-mini-line w40"></div>
+                                </div>
+                                <div class="lp-mini-row">
+                                    <div class="lp-mini-chip"></div>
+                                    <div class="lp-mini-chip"></div>
+                                    <div class="lp-mini-chip"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <strong>Alerts</strong>
+                    </div>
+                    <div class="lp-phone-item reveal-up">
+                        <div class="lp-phone">
+                            <div class="lp-phone-notch"></div>
+                            <div class="lp-phone-screen">
+                                <div class="lp-mini-topbar"><span class="lp-mini-dot"></span>
+                                    <div class="lp-mini-line w40"></div>
+                                </div>
+                                <div class="lp-mini-row">
+                                    <div class="lp-mini-card lp-mini-card-flex">
+                                        <div class="lp-mini-line w60"></div>
+                                        <div class="lp-mini-line w40"></div>
+                                    </div>
+                                    <div class="lp-mini-card lp-mini-card-flex">
+                                        <div class="lp-mini-line w60"></div>
+                                        <div class="lp-mini-line w40"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <strong>Compare</strong>
+                    </div>
+                    <div class="lp-phone-item reveal-up">
+                        <div class="lp-phone">
+                            <div class="lp-phone-notch"></div>
+                            <div class="lp-phone-screen">
+                                <div class="lp-mini-topbar"><span class="lp-mini-dot"></span>
+                                    <div class="lp-mini-line w40"></div>
+                                </div>
+                                <div class="lp-mini-card">
+                                    <div class="lp-mini-line w40"></div>
+                                    <div class="lp-mini-line w80"></div>
+                                </div>
+                                <div class="lp-mini-card">
+                                    <div class="lp-mini-line w40"></div>
+                                    <div class="lp-mini-line w80"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <strong>Settings</strong>
+                    </div>
+                    <div class="lp-phone-item reveal-up">
+                        <div class="lp-phone">
+                            <div class="lp-phone-notch"></div>
+                            <div class="lp-phone-screen">
+                                <div class="lp-mini-topbar"><span class="lp-mini-dot"></span>
+                                    <div class="lp-mini-line w40"></div>
+                                </div>
+                                <div class="lp-mini-row">
+                                    <div class="lp-mini-card lp-mini-card-flex">
+                                        <div class="lp-mini-line w40"></div>
+                                    </div>
+                                    <div class="lp-mini-card lp-mini-card-flex">
+                                        <div class="lp-mini-line w40"></div>
+                                    </div>
+                                    <div class="lp-mini-card lp-mini-card-flex">
+                                        <div class="lp-mini-line w40"></div>
+                                    </div>
+                                </div>
+                                <div class="lp-mini-card">
+                                    <div class="lp-mini-line w80"></div>
+                                    <div class="lp-mini-line w60"></div>
+                                    <div class="lp-mini-line w40"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <strong>Forecast</strong>
+                    </div>
+                    <div class="lp-phone-item reveal-up">
+                        <div class="lp-phone">
+                            <div class="lp-phone-notch"></div>
+                            <div class="lp-phone-screen">
+                                <div class="lp-mini-topbar"><span class="lp-mini-dot"></span>
+                                    <div class="lp-mini-line w40"></div>
+                                </div>
+                                <div class="lp-mini-card">
+                                    <div class="lp-mini-line w60"></div>
+                                    <div class="lp-mini-line w40"></div>
+                                </div>
+                                <div class="lp-mini-card">
+                                    <div class="lp-mini-line w60"></div>
+                                    <div class="lp-mini-line w40"></div>
+                                </div>
+                                <div class="lp-mini-card">
+                                    <div class="lp-mini-line w60"></div>
+                                    <div class="lp-mini-line w40"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <strong>Favourites</strong>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <section class="lp-section" id="download">
-            <div class="card lp-cta">
-                <h2>Take Vayu with you</h2>
-                <p>Install it once and open a full weather dashboard from your home screen, with an offline-ready shell.</p>
+        <section class="lp-install" id="download">
+            <div class="lp-install-decor lp-install-decor-1"></div>
+            <div class="lp-install-decor lp-install-decor-2"></div>
+            <div class="lp-install-inner reveal">
+                <div class="lp-install-icon"><i class="fa-solid fa-cloud-arrow-down"></i></div>
+                <h2>Take Vayu with you, everywhere</h2>
+                <p>Install it once and open a full weather dashboard from your home screen — live forecasts, air quality
+                    and alerts, with an offline-ready shell that keeps working on a patchy connection.</p>
                 <div class="lp-cta-actions">
-                    <a class="btn-solid" href="home.html">Open Dashboard <i class="fa-solid fa-arrow-right"></i></a>
-                    <button class="btn-outline" id="installBtnCta" hidden><i class="fa-solid fa-download"></i> Install App</button>
+                    <a class="btn-solid ripple-btn" href="home.html">Open Dashboard <i
+                            class="fa-solid fa-arrow-right"></i></a>
+                    <button class="btn-outline ripple-btn" id="installBtnCta" hidden><i
+                            class="fa-solid fa-download"></i> Install App</button>
+                </div>
+                <p class="lp-installed-note lp-installed-note-cta" id="installedNoteCta" hidden><i
+                        class="fa-solid fa-circle-check"></i> Vayu is already installed on this device.</p>
+                <div class="lp-install-badges">
+                    <span><i class="fa-solid fa-signal"></i> Works offline</span>
+                    <span><i class="fa-solid fa-bolt"></i> Instant launch</span>
+                    <span><i class="fa-solid fa-shield-halved"></i> No accounts needed</span>
                 </div>
             </div>
         </section>
     </main>
 
-    <footer class="app-footer">Developed by <strong>Mayank Prashar</strong></footer>
+    <footer class="site-footer">
+        <div class="site-footer-inner">
+            <div class="site-footer-brand">
+                <a class="brand" href="index.html">
+                    <img src="assets/vayu_logo.png" alt="" class="brand-logo">
+                    <div class="brand-text">
+                        <span class="brand-name">VAYU</span>
+                        <span class="brand-tag">Weather Intelligence</span>
+                    </div>
+                </a>
+                <p>A multi-API weather intelligence platform with live air quality, astronomy and disaster alerts,
+                    installable on any device.</p>
+            </div>
+            <div class="site-footer-col">
+                <h4>Navigate</h4>
+                <a class="footer-link" href="#home">Home</a>
+                <a class="footer-link" href="#features">Features</a>
+                <a class="footer-link" href="#about">About</a>
+                <a class="footer-link" href="#download">Install</a>
+            </div>
+            <div class="site-footer-col">
+                <h4>Product</h4>
+                <a class="footer-link" href="home.html">Dashboard</a>
+                <a class="footer-link" href="home.html">Forecast</a>
+                <a class="footer-link" href="#aqi-preview">Air Quality</a>
+                <a class="footer-link" href="#screenshots">Screenshots</a>
+            </div>
+            <div class="site-footer-col">
+                <h4>Connect</h4>
+                <div class="site-footer-social">
+                    <a class="icon-btn small footer-link" href="#" aria-label="GitHub"><i
+                            class="fa-brands fa-github"></i></a>
+                    <a class="icon-btn small footer-link" href="#" aria-label="LinkedIn"><i
+                            class="fa-brands fa-linkedin-in"></i></a>
+                    <a class="icon-btn small footer-link" href="#" aria-label="Twitter"><i
+                            class="fa-brands fa-x-twitter"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="site-footer-bottom">
+            <span>Developed by <strong>Mayank Prashar</strong></span>
+            <span>&copy; <span id="footerYear"></span> Vayu. All rights reserved.</span>
+        </div>
+    </footer>
     <script src="landing.js"></script>
 </body>
 
