@@ -1,8 +1,10 @@
-const SHELL_CACHE = 'vayu-shell-v4';
+const SHELL_CACHE = 'vayu-shell-v5';
 const API_CACHE = 'vayu-api-v1';
 const SHELL_ASSETS = [
   './',
   './index.html',
+  './home.html',
+  './landing.js',
   './style.css',
   './config.js',
   './script.js',

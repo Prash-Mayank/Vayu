@@ -16,682 +16,378 @@
         href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body data-theme="dark">
-    <header class="topbar">
-        <button class="icon-btn only-mobile" id="menuToggle" aria-label="Open menu"><i
-                class="fa-solid fa-bars"></i></button>
-        <div class="brand">
-            <img src="assets/vayu_logo.png" alt="" class="brand-logo">
-            <div class="brand-text">
-                <span class="brand-name">VAYU</span>
-                <span class="brand-tag only-desktop">Weather Intelligence</span>
-            </div>
-        </div>
-        <div class="topbar-actions only-mobile">
-            <button class="icon-btn" id="favBtnMobile" aria-label="Favourites"><i
-                    class="fa-regular fa-star"></i></button>
-            <button class="icon-btn" id="alertBellBtnMobile" aria-label="Notifications"><i
-                    class="fa-regular fa-bell"></i><span class="bell-dot" hidden></span></button>
-            <button class="icon-btn" id="moreMenuBtn" aria-label="More options"><i
-                    class="fa-solid fa-ellipsis-vertical"></i></button>
-        </div>
-    </header>
-
-    <div class="app-shell">
-        <nav class="sidebar only-desktop" id="sidebar" aria-label="Primary">
-            <div class="sidebar-brand">
-                <img src="assets/vayu_logo.png" alt="" class="brand-logo lg">
+    <header class="lp-nav">
+        <div class="lp-nav-inner">
+            <a class="brand" href="index.html">
+                <img src="assets/vayu_logo.png" alt="" class="brand-logo">
                 <div class="brand-text">
                     <span class="brand-name">VAYU</span>
                     <span class="brand-tag">Weather Intelligence</span>
                 </div>
-            </div>
-
-            <ul class="nav-list" id="navList">
-                <li><button class="nav-link active" data-view="dashboard"><i
-                            class="fa-solid fa-house"></i><span>Dashboard</span></button></li>
-                <li><button class="nav-link" data-view="forecast"><i
-                            class="fa-solid fa-cloud-sun-rain"></i><span>Forecast</span></button></li>
-                <li><button class="nav-link" data-view="airquality"><i class="fa-solid fa-wind"></i><span>Air
-                            Quality</span></button></li>
-                <li><button class="nav-link" data-view="astronomy"><i
-                            class="fa-solid fa-moon"></i><span>Astronomy</span></button></li>
-                <li><button class="nav-link" data-view="compare"><i class="fa-solid fa-scale-balanced"></i><span>Compare
-                            Cities</span></button></li>
-                <li><button class="nav-link" data-view="favourites"><i
-                            class="fa-solid fa-heart"></i><span>Favourites</span></button></li>
-                <li><button class="nav-link" data-view="recent"><i
-                            class="fa-solid fa-clock-rotate-left"></i><span>Recent Searches</span></button></li>
-                <li><button class="nav-link" data-view="settings"><i
-                            class="fa-solid fa-gear"></i><span>Settings</span></button></li>
-            </ul>
-
-            <div class="sidebar-footer">
-                <div class="seg-toggle" id="unitToggle" role="group" aria-label="Temperature unit">
-                    <button class="seg-btn active" data-unit="C">°C</button>
-                    <button class="seg-btn" data-unit="F">°F</button>
-                </div>
-                <div class="row-toggle">
-                    <span><i class="fa-solid fa-sun"></i> Light</span>
-                    <button class="switch theme-switch" id="themeSwitch" role="switch" aria-checked="true"
-                        aria-label="Toggle dark mode">
-                        <span class="switch-thumb"></span>
-                    </button>
-                    <span><i class="fa-solid fa-moon"></i> Dark</span>
-                </div>
-                <button class="loc-pill" id="useMyLocation">
-                    <i class="fa-solid fa-location-crosshairs"></i>
-                    <span class="loc-pill-text">
-                        <small>Use my location</small>
-                        <strong id="loc-pill-city">New Delhi, IN</strong>
-                    </span>
-                    <i class="fa-solid fa-rotate" id="locRefreshIcon"></i>
-                </button>
-            </div>
-        </nav>
-        <div class="drawer-overlay" id="drawerOverlay"></div>
-        <nav class="drawer" id="drawer" aria-label="Menu">
-            <ul class="nav-list">
-                <li><button class="nav-link" data-view="dashboard"><i
-                            class="fa-solid fa-house"></i><span>Dashboard</span></button></li>
-                <li><button class="nav-link" data-view="forecast"><i
-                            class="fa-solid fa-cloud-sun-rain"></i><span>Forecast</span></button></li>
-                <li><button class="nav-link" data-view="airquality"><i class="fa-solid fa-wind"></i><span>Air
-                            Quality</span></button></li>
-                <li><button class="nav-link" data-view="astronomy"><i
-                            class="fa-solid fa-moon"></i><span>Astronomy</span></button></li>
-                <li><button class="nav-link" data-view="compare"><i class="fa-solid fa-scale-balanced"></i><span>Compare
-                            Cities</span></button></li>
-                <li><button class="nav-link" data-view="favourites"><i
-                            class="fa-solid fa-heart"></i><span>Favourites</span></button></li>
-                <li><button class="nav-link" data-view="recent"><i
-                            class="fa-solid fa-clock-rotate-left"></i><span>Recent Searches</span></button></li>
-                <li><button class="nav-link" data-view="settings"><i
-                            class="fa-solid fa-gear"></i><span>Settings</span></button></li>
-            </ul>
-            <div class="row-toggle">
-                <span><i class="fa-solid fa-sun"></i></span>
-                <button class="switch theme-switch" id="themeSwitchMobile" role="switch" aria-checked="true"
-                    aria-label="Toggle dark mode">
-                    <span class="switch-thumb"></span>
-                </button>
-                <span><i class="fa-solid fa-moon"></i></span>
-            </div>
-        </nav>
-
-        <div class="notif-overlay" id="notifOverlay"></div>
-        <div class="notif-panel" id="notifPanel" aria-label="Notifications">
-            <div class="notif-panel-head">
-                <h3><i class="fa-solid fa-bell"></i> Notifications</h3>
-                <button class="icon-btn tiny" id="notifCloseBtn" aria-label="Close notifications"><i
-                        class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="notif-panel-body" id="notifPanelBody">
-                <div class="empty-row muted">No active alerts or events near this location.</div>
-            </div>
+            </a>
+            <button class="icon-btn lp-nav-toggle" id="lpNavToggle" aria-label="Open menu" aria-expanded="false">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+            <nav class="lp-nav-links" id="lpNavLinks" aria-label="Primary">
+                <a href="#home" class="lp-nav-link">Home</a>
+                <a href="#features" class="lp-nav-link">Features</a>
+                <a href="#about" class="lp-nav-link">About</a>
+                <a href="home.html" class="lp-nav-link">Dashboard</a>
+                <a href="#download" class="lp-nav-link">Install</a>
+                <button class="btn-solid lp-nav-install" id="installBtnNav" hidden><i class="fa-solid fa-download"></i> Install</button>
+            </nav>
         </div>
+    </header>
 
-        <main class="main" id="mainContent">
-
-            <div class="search-row">
-                <label class="search-box">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" id="citySearch" placeholder="Search for a city…" aria-label="Search for a city"
-                        autocomplete="off">
-                    <button class="icon-btn small" id="useLocBtnInline" aria-label="Use my location"><i
-                            class="fa-solid fa-location-crosshairs"></i></button>
-                </label>
-                <div id="searchSuggestions" class="suggestions" hidden></div>
-                <button class="btn-outline" id="compareToggleBtn"><i class="fa-solid fa-scale-balanced"></i><span
-                        class="compare-label">&nbsp;Compare</span></button>
-                <div class="topbar-actions only-desktop">
-                    <button class="icon-btn" id="favBtnDesktop" aria-label="Favourites"><i
-                            class="fa-regular fa-star"></i></button>
-                    <button class="icon-btn" id="alertBellBtnDesktop" aria-label="Notifications"><i
-                            class="fa-regular fa-bell"></i><span class="bell-dot" hidden></span></button>
-                    <button class="icon-btn" id="themeToggleDesktop" aria-label="Toggle theme"><i
-                            class="fa-solid fa-circle-half-stroke"></i></button>
+    <main>
+        <section class="lp-hero" id="home">
+            <div class="lp-hero-bg"
+                style="background-image:linear-gradient(180deg, rgba(7,13,24,0.6), rgba(7,13,24,0.97)), url('https://images.unsplash.com/photo-1601134467661-3d775b999c8b?auto=format&fit=crop&w=1600&q=60')">
+            </div>
+            <div class="lp-hero-content">
+                <span class="pill good lp-badge"><i class="fa-solid fa-bolt"></i> Multi-API Weather Platform</span>
+                <h1 class="lp-hero-title">Weather Intelligence, <span>Reimagined</span></h1>
+                <p class="lp-hero-desc">Real-time forecasts, live air quality, astronomy and severe-weather alerts — all in one fast, installable app.</p>
+                <div class="lp-hero-actions">
+                    <a class="btn-solid" href="home.html">Get Started <i class="fa-solid fa-arrow-right"></i></a>
+                    <button class="btn-outline" id="installBtnHero" hidden><i class="fa-solid fa-download"></i> Install App</button>
+                </div>
+                <p class="lp-installed-note" id="installedNote" hidden><i class="fa-solid fa-circle-check"></i> Vayu is already installed on this device.</p>
+                <div class="lp-hero-stats">
+                    <div class="lp-stat"><strong>7-Day</strong><small>Forecast</small></div>
+                    <div class="lp-stat"><strong>Live</strong><small>Air Quality</small></div>
+                    <div class="lp-stat"><strong>Real-Time</strong><small>Disaster Alerts</small></div>
+                    <div class="lp-stat"><strong>100%</strong><small>Installable PWA</small></div>
                 </div>
             </div>
+        </section>
 
-            <section class="view active" id="view-dashboard">
-                <article class="card hero-card" id="heroCard">
-                    <div class="hero-bg is-active" id="heroBgA"
-                        style="background-image:linear-gradient(180deg, rgba(7,13,24,0.35), rgba(7,13,24,0.85)), url('https://images.unsplash.com/photo-1587474260584-136574528ed5?auto=format&fit=crop&w=1400&q=60')">
-                    </div>
-                    <div class="hero-bg" id="heroBgB"></div>
-                    <div class="hero-overlay">
-                        <div class="hero-top">
-                            <div>
-                                <p class="greeting" id="greeting">Hello 👋</p>
-                                <h1 class="city-name"><span id="cityName">New Delhi, India</span> <i
-                                        class="fa-solid fa-location-dot"></i></h1>
-                                <p class="city-date" id="cityDate">Loading date…</p>
-                            </div>
-                            <div class="hi-lo">
-                                <span><i class="fa-solid fa-arrow-up"></i> <span id="tempHigh">--°</span></span>
-                                <span><i class="fa-solid fa-arrow-down"></i> <span id="tempLow">--°</span></span>
-                                <button class="icon-btn tiny share-btn" id="shareBtn"
-                                    aria-label="Share current weather"><i class="fa-solid fa-share-nodes"></i></button>
-                            </div>
-                        </div>
-                        <div class="hero-mid">
-                            <i class="fa-solid fa-cloud-sun weather-icon" id="currentIcon"></i>
-                            <div class="temp-block">
-                                <span class="temp-big mono" id="currentTemp">--°</span>
-                                <div class="temp-meta">
-                                    <span id="currentCondition">—</span>
-                                    <span id="feelsLike" class="muted">Feels like --°</span>
-                                </div>
-                            </div>
-                            <div class="hero-astro only-desktop">
-                                <div><i class="fa-solid fa-sun"></i> Sunrise <strong id="sunriseTimeHero">--:--</strong>
-                                </div>
-                                <div><i class="fa-solid fa-sun"></i> Sunset <strong id="sunsetTimeHero">--:--</strong>
-                                </div>
-                                <div><i class="fa-solid fa-circle-half-stroke"></i> Solar Noon <strong
-                                        id="solarNoonTimeHero">--:--</strong></div>
-                                <div><i class="fa-solid fa-hourglass-half"></i> Day Length <strong
-                                        id="dayLengthHero">--</strong></div>
-                                <div><i class="fa-solid fa-cloud-sun"></i> Golden Hour <strong
-                                        id="goldenPMHero">--</strong></div>
-                            </div>
-                        </div>
-                        <div class="stat-grid">
-                            <div class="stat"><i class="fa-solid fa-droplet"></i>
-                                <div><small>Humidity</small><strong id="statHumidity">--%</strong></div>
-                            </div>
-                            <div class="stat"><i class="fa-solid fa-wind"></i>
-                                <div><small>Wind</small><strong id="statWind">-- km/h</strong></div>
-                            </div>
-                            <div class="stat"><i class="fa-solid fa-gauge-high"></i>
-                                <div><small>Pressure</small><strong id="statPressure">-- hPa</strong></div>
-                            </div>
-                            <div class="stat"><i class="fa-solid fa-eye"></i>
-                                <div><small>Visibility</small><strong id="statVisibility">-- km</strong></div>
-                            </div>
-                        </div>
-                    </div>
+        <section class="lp-section" id="features">
+            <div class="lp-section-head">
+                <span class="lp-eyebrow">Features</span>
+                <h2>Everything your sky needs</h2>
+                <p>One dashboard for forecasts, air quality, astronomy and severe-weather alerts, powered by multiple reliable data sources.</p>
+            </div>
+            <div class="lp-feature-grid">
+                <article class="card lp-feature-card">
+                    <div class="lp-feature-icon"><i class="fa-solid fa-cloud-sun-rain"></i></div>
+                    <h3>7-Day Forecast</h3>
+                    <p>Hourly and daily outlooks with feels-like, wind, humidity and UV, powered by dual weather sources for reliability.</p>
                 </article>
-
-                <article class="card decor-leaf">
-                    <div class="card-head">
-                        <h2><i class="fa-solid fa-wind"></i> Air Quality Index <span
-                                class="muted small aqi-source-label">(IQAir)</span></h2>
-                        <span class="pill aqi-badge good">—</span>
-                    </div>
-                    <div class="aqi-main">
-                        <span class="aqi-number mono">--</span>
-                        <span class="muted">AQI (US)</span>
-                    </div>
-                    <div class="aqi-scale">
-                        <div class="aqi-scale-track">
-                            <div class="aqi-scale-dot"></div>
-                        </div>
-                        <div class="aqi-scale-labels">
-                            <span>0</span><span>50</span><span>100</span><span>150</span><span>200</span><span>300</span><span>500</span>
-                        </div>
-                    </div>
-                    <div class="pollutant-grid">
-                        <div class="pollutant"><small>PM2.5</small><strong class="pm25">--</strong><small
-                                class="muted">µg/m³</small></div>
-                        <div class="pollutant"><small>PM10</small><strong class="pm10">--</strong><small
-                                class="muted">µg/m³</small></div>
-                        <div class="pollutant"><small>O₃</small><strong class="o3">--</strong><small
-                                class="muted">ppb</small></div>
-                        <div class="pollutant"><small>NO₂</small><strong class="no2">--</strong><small
-                                class="muted">ppb</small></div>
-                        <div class="pollutant"><small>SO₂</small><strong class="so2">--</strong><small
-                                class="muted">ppb</small></div>
-                        <div class="pollutant"><small>CO</small><strong class="co">--</strong><small
-                                class="muted">ppm</small></div>
-                    </div>
-                    <p class="advisory"><i class="fa-solid fa-circle-info"></i> <span class="health-advisory">Air
-                            quality data will appear once a city is loaded.</span></p>
-                    <p class="no-key-note" id="iqairKeyNote" hidden><i class="fa-solid fa-key"></i> Add your IQAir API
-                        key in <code>config.js</code> to see live pollutant data — see README.</p>
-                    <button class="btn-link" data-view="airquality">View Full Report <i
-                            class="fa-solid fa-arrow-right"></i></button>
+                <article class="card lp-feature-card">
+                    <div class="lp-feature-icon"><i class="fa-solid fa-wind"></i></div>
+                    <h3>Live Air Quality</h3>
+                    <p>Real-time AQI, full pollutant breakdown and health advisories sourced from IQAir and Open-Meteo.</p>
                 </article>
-
-                <article class="card">
-                    <div class="card-head">
-                        <h2><i class="fa-solid fa-clock"></i> 24-Hour Forecast</h2>
-                    </div>
-                    <div class="hourly-scroll" id="hourlyScroll"></div>
+                <article class="card lp-feature-card">
+                    <div class="lp-feature-icon"><i class="fa-solid fa-moon"></i></div>
+                    <h3>Astronomy</h3>
+                    <p>Sunrise, sunset, solar noon, golden hour windows and moon phase for any city you search.</p>
                 </article>
+                <article class="card lp-feature-card">
+                    <div class="lp-feature-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                    <h3>Severe Alerts</h3>
+                    <p>Nearby natural-event alerts from NASA EONET, surfaced right in your notifications.</p>
+                </article>
+                <article class="card lp-feature-card">
+                    <div class="lp-feature-icon"><i class="fa-solid fa-scale-balanced"></i></div>
+                    <h3>Compare Cities</h3>
+                    <p>Put two cities side by side across temperature, humidity and wind in a single view.</p>
+                </article>
+                <article class="card lp-feature-card">
+                    <div class="lp-feature-icon"><i class="fa-solid fa-mobile-screen-button"></i></div>
+                    <h3>Installable PWA</h3>
+                    <p>Add Vayu to your home screen for an app-like experience with offline shell support.</p>
+                </article>
+            </div>
+        </section>
 
-                <div class="grid-two">
-                    <article class="card">
-                        <div class="card-head">
-                            <h2><i class="fa-solid fa-calendar-days"></i> 7-Day Forecast</h2>
-                        </div>
-                        <ul class="daily-list" id="dailyList"></ul>
-                    </article>
-
-                    <article class="card">
-                        <div class="card-head">
-                            <h2><i class="fa-solid fa-chart-line"></i> Temperature Trend <span
-                                    class="muted small">(24h)</span></h2>
-                        </div>
-                        <div class="chart-wrap"><canvas id="tempTrendChart"></canvas></div>
-                    </article>
+        <section class="lp-section" id="about">
+            <div class="lp-section-head">
+                <span class="lp-eyebrow">Why Choose Vayu</span>
+                <h2>Built to be fast, honest and reliable</h2>
+                <p>No clutter, no dark patterns — just accurate weather intelligence that respects your time and your device.</p>
+            </div>
+            <div class="lp-why-grid">
+                <div class="lp-why-item">
+                    <i class="fa-solid fa-layer-group"></i>
+                    <div>
+                        <h3>Dual-Source Reliability</h3>
+                        <p>Weather and air quality data is cross-checked across multiple providers, with automatic fallbacks so you always see real numbers.</p>
+                    </div>
                 </div>
+                <div class="lp-why-item">
+                    <i class="fa-solid fa-gauge-high"></i>
+                    <div>
+                        <h3>Fast & Lightweight</h3>
+                        <p>Built with vanilla JavaScript and no heavy frameworks, so it loads quickly even on slower connections.</p>
+                    </div>
+                </div>
+                <div class="lp-why-item">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <div>
+                        <h3>Privacy-First</h3>
+                        <p>Your favourites, recent searches and preferences stay on your device. No accounts, no tracking.</p>
+                    </div>
+                </div>
+                <div class="lp-why-item">
+                    <i class="fa-solid fa-download"></i>
+                    <div>
+                        <h3>Works Offline</h3>
+                        <p>Install Vayu to your home screen and the app shell keeps working even with a patchy connection.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-                <article class="card decor-moon" id="astroPreviewCard">
-                    <div class="card-head">
-                        <h2><i class="fa-solid fa-moon"></i> Astronomy</h2>
-                        <button class="btn-link" data-view="astronomy">View Details <i
-                                class="fa-solid fa-arrow-right"></i></button>
-                    </div>
-                    <div class="sun-arc-wrap">
-                        <div class="sun-arc" id="sunArc">
-                            <div class="sun-marker" id="sunMarker"><i class="fa-solid fa-sun"></i></div>
-                        </div>
-                        <div class="arc-points">
-                            <div class="arc-point"><i class="fa-solid fa-sun"></i><small>Sunrise</small><strong
-                                    id="sunriseTime">--:--</strong></div>
-                            <div class="arc-point"><i class="fa-solid fa-sun"></i><small>Solar Noon</small><strong
-                                    id="solarNoonTime">--:--</strong></div>
-                            <div class="arc-point"><i class="fa-solid fa-sun"></i><small>Sunset</small><strong
-                                    id="sunsetTime">--:--</strong></div>
-                        </div>
-                    </div>
-                    <div class="astro-meta-grid">
-                        <div><small>Golden Hour (AM)</small><strong id="goldenAM">--</strong></div>
-                        <div><small>Day Length</small><strong id="dayLength">--</strong></div>
-                        <div><small>Golden Hour (PM)</small><strong id="goldenPM">--</strong></div>
-                    </div>
-                </article>
-
-                <footer class="app-footer">Developed by <strong>Mayank Prashar</strong></footer>
-            </section>
-
-            <section class="view" id="view-airquality">
-                <article class="card decor-leaf">
-                    <div class="card-head">
-                        <h2><i class="fa-solid fa-wind"></i> Air Quality <span
-                                class="muted small aqi-source-label">(IQAir)</span></h2>
-                        <span class="muted small" id="aqiCityLabel">your city</span>
-                    </div>
-                    <div class="aqi-detail-grid">
-                        <div class="aqi-detail-main">
-                            <div class="aqi-main">
-                                <span class="aqi-number mono">--</span>
-                                <span class="muted">AQI (US)</span>
-                                <span class="pill aqi-badge good">—</span>
+        <section class="lp-section" id="forecast-preview">
+            <div class="lp-preview">
+                <div class="lp-preview-copy">
+                    <span class="lp-eyebrow">Forecast Preview</span>
+                    <h2>Hour-by-hour clarity, every day</h2>
+                    <p>Scroll through hourly conditions or scan the full week ahead — temperature, precipitation chance, wind and feels-like are always one glance away.</p>
+                    <ul class="lp-preview-list">
+                        <li><i class="fa-solid fa-circle-check"></i> Hourly and 7-day outlooks</li>
+                        <li><i class="fa-solid fa-circle-check"></i> Feels-like, wind and humidity</li>
+                        <li><i class="fa-solid fa-circle-check"></i> Precipitation probability charts</li>
+                    </ul>
+                    <a class="btn-solid" href="home.html" style="align-self:flex-start;">Open Forecast <i class="fa-solid fa-arrow-right"></i></a>
+                </div>
+                <div class="lp-preview-visual">
+                    <div class="card">
+                        <div class="card-head"><h2><i class="fa-solid fa-cloud-sun-rain"></i> Hourly Forecast</h2></div>
+                        <div class="hourly-scroll">
+                            <div class="hour-card">
+                                <span class="hour-label">Now</span>
+                                <i class="fa-solid fa-sun"></i>
+                                <span class="hour-temp">29°</span>
+                                <span class="hour-condition">Clear sky</span>
                             </div>
-                            <div class="aqi-scale">
-                                <div class="aqi-scale-track">
-                                    <div class="aqi-scale-dot"></div>
-                                </div>
-                                <div class="aqi-scale-labels">
-                                    <span>0</span><span>50</span><span>100</span><span>150</span><span>200</span><span>300</span><span>500</span>
-                                </div>
+                            <div class="hour-card">
+                                <span class="hour-label">1 PM</span>
+                                <i class="fa-solid fa-cloud-sun"></i>
+                                <span class="hour-temp">31°</span>
+                                <span class="hour-condition">Partly cloudy</span>
+                            </div>
+                            <div class="hour-card">
+                                <span class="hour-label">2 PM</span>
+                                <i class="fa-solid fa-cloud"></i>
+                                <span class="hour-temp">30°</span>
+                                <span class="hour-condition">Cloudy</span>
+                            </div>
+                            <div class="hour-card">
+                                <span class="hour-label">3 PM</span>
+                                <i class="fa-solid fa-cloud-showers-heavy"></i>
+                                <span class="hour-temp">27°</span>
+                                <span class="hour-condition">Light rain</span>
+                            </div>
+                            <div class="hour-card">
+                                <span class="hour-label">4 PM</span>
+                                <i class="fa-solid fa-cloud-sun"></i>
+                                <span class="hour-temp">28°</span>
+                                <span class="hour-condition">Partly cloudy</span>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="lp-section" id="aqi-preview">
+            <div class="lp-preview reverse">
+                <div class="lp-preview-copy">
+                    <span class="lp-eyebrow">Air Quality Preview</span>
+                    <h2>Know what you're breathing</h2>
+                    <p>A live US AQI score, full pollutant breakdown and a plain-language health advisory for every city you check.</p>
+                    <ul class="lp-preview-list">
+                        <li><i class="fa-solid fa-circle-check"></i> Real-time AQI with colour bands</li>
+                        <li><i class="fa-solid fa-circle-check"></i> PM2.5, PM10, O3, NO2 and more</li>
+                        <li><i class="fa-solid fa-circle-check"></i> Health advisories for sensitive groups</li>
+                    </ul>
+                    <a class="btn-solid" href="home.html" style="align-self:flex-start;">Open Air Quality <i class="fa-solid fa-arrow-right"></i></a>
+                </div>
+                <div class="lp-preview-visual">
+                    <div class="card">
+                        <div class="card-head"><h2><i class="fa-solid fa-wind"></i> Air Quality Index</h2></div>
                         <div class="aqi-detail-side">
-                            <i class="fa-solid fa-leaf"></i>
-                            <p class="health-advisory">Air quality data will appear once a city is loaded.</p>
+                            <i class="fa-solid fa-face-smile"></i>
+                            <span class="aqi-number">42</span>
+                            <span class="pill good">Good</span>
                         </div>
-                    </div>
-                </article>
-
-                <div class="grid-two">
-                    <article class="card">
-                        <div class="card-head">
-                            <h2>Pollutant Breakdown</h2>
-                        </div>
-                        <div class="pollutant-grid">
-                            <div class="pollutant"><small>PM2.5</small><strong class="pm25">--</strong><small
-                                    class="muted">µg/m³</small></div>
-                            <div class="pollutant"><small>PM10</small><strong class="pm10">--</strong><small
-                                    class="muted">µg/m³</small></div>
-                            <div class="pollutant"><small>O₃</small><strong class="o3">--</strong><small
-                                    class="muted">ppb</small></div>
-                            <div class="pollutant"><small>NO₂</small><strong class="no2">--</strong><small
-                                    class="muted">ppb</small></div>
-                            <div class="pollutant"><small>SO₂</small><strong class="so2">--</strong><small
-                                    class="muted">ppb</small></div>
-                            <div class="pollutant"><small>CO</small><strong class="co">--</strong><small
-                                    class="muted">ppm</small></div>
-                        </div>
-                        <p class="no-key-note" hidden><i class="fa-solid fa-key"></i> Add your IQAir API key in
-                            <code>config.js</code> to see live pollutant data.</p>
-                    </article>
-                    <article class="card">
-                        <div class="card-head">
-                            <h2>AQI Scale Guide (US)</h2>
+                        <div class="aqi-scale">
+                            <div class="aqi-scale-track"><div class="aqi-scale-dot" style="left:20%"></div></div>
                         </div>
                         <div class="scale-guide">
-                            <div class="scale-swatch band-good"><strong>0-50</strong><span>Good</span></div>
-                            <div class="scale-swatch band-moderate"><strong>51-100</strong><span>Moderate</span></div>
-                            <div class="scale-swatch band-usg"><strong>101-150</strong><span>Unhealthy for Sensitive
-                                    Groups</span></div>
-                            <div class="scale-swatch band-unhealthy"><strong>151-200</strong><span>Unhealthy</span>
+                            <div class="scale-swatch band-good"><strong>Good</strong><span>0-50</span></div>
+                            <div class="scale-swatch band-moderate"><strong>Moderate</strong><span>51-100</span></div>
+                            <div class="scale-swatch band-usg"><strong>USG</strong><span>101-150</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="lp-section" id="astro-preview">
+            <div class="lp-preview">
+                <div class="lp-preview-copy">
+                    <span class="lp-eyebrow">Astronomy Preview</span>
+                    <h2>Golden hour, mapped out</h2>
+                    <p>Track sunrise, solar noon and sunset with a live position marker, plus the current moon phase for any city.</p>
+                    <ul class="lp-preview-list">
+                        <li><i class="fa-solid fa-circle-check"></i> Sunrise and sunset times</li>
+                        <li><i class="fa-solid fa-circle-check"></i> Golden hour windows</li>
+                        <li><i class="fa-solid fa-circle-check"></i> Current moon phase</li>
+                    </ul>
+                    <a class="btn-solid" href="home.html" style="align-self:flex-start;">Open Astronomy <i class="fa-solid fa-arrow-right"></i></a>
+                </div>
+                <div class="lp-preview-visual">
+                    <div class="card">
+                        <div class="card-head"><h2><i class="fa-solid fa-moon"></i> Astronomy</h2></div>
+                        <div class="sun-arc-wrap">
+                            <div class="sun-arc">
+                                <div class="sun-marker" style="left:55%; bottom:78%;"><i class="fa-solid fa-sun"></i></div>
                             </div>
-                            <div class="scale-swatch band-veryunhealthy"><strong>201-300</strong><span>Very
-                                    Unhealthy</span></div>
-                            <div class="scale-swatch band-hazardous"><strong>301+</strong><span>Hazardous</span></div>
+                            <div class="arc-points">
+                                <div class="arc-point"><i class="fa-solid fa-arrow-up"></i><small>Sunrise</small><strong>6:04 AM</strong></div>
+                                <div class="arc-point"><i class="fa-solid fa-circle"></i><small>Solar Noon</small><strong>12:31 PM</strong></div>
+                                <div class="arc-point"><i class="fa-solid fa-arrow-down"></i><small>Sunset</small><strong>7:02 PM</strong></div>
+                            </div>
                         </div>
-                    </article>
+                    </div>
                 </div>
+            </div>
+        </section>
 
-                <article class="card">
-                    <div class="card-head">
-                        <h2><i class="fa-solid fa-chart-column"></i> AQI Trend <span class="muted small">(24
-                                Hours)</span></h2>
-                    </div>
-                    <div class="chart-wrap tall"><canvas id="aqiTrendChart"></canvas></div>
-                </article>
-
-                <div class="grid-two">
-                    <article class="card">
-                        <div class="card-head">
-                            <h2>Health Advisory</h2>
-                        </div>
-                        <p class="advisory"><i class="fa-solid fa-shield-halved"></i> <span class="health-advisory">Air
-                                quality data will appear once a city is loaded.</span></p>
-                    </article>
-                    <article class="card">
-                        <div class="card-head">
-                            <h2>Source Details</h2>
-                        </div>
-                        <div class="aqi-extra-grid">
-                            <div><small>Dominant Pollutant</small><strong id="dominantPollutantName">—</strong><span
-                                    id="dominantPollutantValue" class="muted small">--</span></div>
-                            <div><small>Data Update Frequency</small><strong>Every 1 Hour</strong></div>
-                            <div><small>Data Provider</small><strong id="aqiProvider">IQAir</strong></div>
-                        </div>
-                    </article>
+        <section class="lp-section" id="compare-preview">
+            <div class="lp-preview reverse">
+                <div class="lp-preview-copy">
+                    <span class="lp-eyebrow">Compare Cities Preview</span>
+                    <h2>Two cities, one view</h2>
+                    <p>Planning a trip or comparing hometowns? Line up temperature, humidity and wind side by side in seconds.</p>
+                    <ul class="lp-preview-list">
+                        <li><i class="fa-solid fa-circle-check"></i> Side-by-side live stats</li>
+                        <li><i class="fa-solid fa-circle-check"></i> Highlights the better reading</li>
+                        <li><i class="fa-solid fa-circle-check"></i> Works with any two searchable cities</li>
+                    </ul>
+                    <a class="btn-solid" href="home.html" style="align-self:flex-start;">Open Compare <i class="fa-solid fa-arrow-right"></i></a>
                 </div>
-            </section>
-
-            <section class="view" id="view-astronomy">
-                <article class="card decor-moon">
-                    <div class="card-head">
-                        <h2><i class="fa-solid fa-moon"></i> Astronomy</h2>
-                    </div>
-                    <div class="sun-arc-wrap large">
-                        <div class="sun-arc" id="sunArcFull">
-                            <div class="sun-marker" id="sunMarkerFull"><i class="fa-solid fa-sun"></i></div>
-                        </div>
-                        <div class="arc-points">
-                            <div class="arc-point"><i class="fa-solid fa-sun"></i><small>Sunrise</small><strong
-                                    id="sunriseTimeFull">--:--</strong></div>
-                            <div class="arc-point"><i class="fa-solid fa-sun"></i><small>Solar Noon</small><strong
-                                    id="solarNoonTimeFull">--:--</strong></div>
-                            <div class="arc-point"><i class="fa-solid fa-sun"></i><small>Sunset</small><strong
-                                    id="sunsetTimeFull">--:--</strong></div>
-                        </div>
-                    </div>
-                    <div class="astro-meta-grid">
-                        <div><small>Golden Hour (AM)</small><strong id="goldenAMFull">--</strong></div>
-                        <div><small>Day Length</small><strong id="dayLengthFull">--</strong></div>
-                        <div><small>Golden Hour (PM)</small><strong id="goldenPMFull">--</strong></div>
-                    </div>
-                    <div class="astro-meta-grid">
-                        <div><small>UV Index</small><strong id="uvIndex">--</strong></div>
-                        <div><small>UV Advisory</small><strong id="uvAdvisory">--</strong></div>
-                        <div><small>Moon Phase</small><strong id="moonPhaseName">--</strong><span
-                                id="moonPhaseIllumination" class="muted small">--</span></div>
-                    </div>
-                </article>
-            </section>
-
-            <section class="view" id="view-forecast">
-                <article class="card">
-                    <div class="card-head">
-                        <h2><i class="fa-solid fa-calendar-days"></i> 7-Day Forecast Overview</h2>
-                    </div>
-                    <div class="overview-strip" id="dailyOverview"></div>
-                </article>
-
-                <div class="grid-two">
-                    <article class="card">
-                        <div class="card-head">
-                            <h2><i class="fa-solid fa-cloud-sun"></i> Today's Summary</h2>
-                        </div>
-                        <div class="today-summary">
-                            <div class="today-summary-main">
-                                <i class="fa-solid fa-cloud-sun" id="summaryIcon"></i>
-                                <div>
-                                    <span class="today-summary-temp mono" id="summaryTemp">--°</span>
-                                    <span id="summaryCondition">—</span>
-                                    <span class="muted small" id="summaryFeels">Feels like --°</span>
+                <div class="lp-preview-visual">
+                    <div class="card">
+                        <div class="card-head"><h2><i class="fa-solid fa-scale-balanced"></i> Compare Cities</h2></div>
+                        <div class="compare-grid">
+                            <div>
+                                <div class="city-row"><i class="fa-solid fa-location-dot"></i><span class="city-row-name">New Delhi</span></div>
+                                <div class="compare-card">
+                                    <div class="compare-stat"><span>Temp</span><span class="better">31°C</span></div>
+                                    <div class="compare-stat"><span>Humidity</span><span class="worse">58%</span></div>
+                                    <div class="compare-stat"><span>Wind</span><span class="better">12 km/h</span></div>
                                 </div>
                             </div>
-                            <div class="today-summary-stats">
-                                <div><small>Max / Min</small><strong id="summaryHiLo">--° / --°</strong></div>
-                                <div><small>Humidity</small><strong id="summaryHumidity">--%</strong></div>
-                                <div><small>Wind</small><strong id="summaryWind">-- km/h</strong></div>
-                                <div><small>UV Index</small><strong id="summaryUv">--</strong></div>
-                                <div><small>Rain Chance</small><strong id="summaryRain">--%</strong></div>
-                            </div>
-                        </div>
-                    </article>
-                    <article class="card">
-                        <div class="card-head">
-                            <h2><i class="fa-solid fa-clock"></i> 24-Hour Forecast</h2>
-                        </div>
-                        <div class="hourly-scroll" id="hourlyScrollFull"></div>
-                    </article>
-                </div>
-
-                <div class="grid-two">
-                    <article class="card">
-                        <div class="card-head">
-                            <h2><i class="fa-solid fa-chart-line"></i> Temperature Trend <span
-                                    class="muted small">(24h)</span></h2>
-                        </div>
-                        <div class="chart-wrap"><canvas id="tempTrendChartForecast"></canvas></div>
-                    </article>
-                    <article class="card">
-                        <div class="card-head">
-                            <h2><i class="fa-solid fa-cloud-rain"></i> Precipitation Chance <span
-                                    class="muted small">(Next 24h)</span></h2>
-                        </div>
-                        <div class="chart-wrap"><canvas id="precipChart"></canvas></div>
-                    </article>
-                </div>
-
-                <div class="grid-two">
-                    <article class="card">
-                        <div class="card-head">
-                            <h2><i class="fa-solid fa-wind"></i> Wind Forecast <span class="muted small"
-                                    id="windSummary"></span></h2>
-                        </div>
-                        <div class="wind-list" id="windList"></div>
-                    </article>
-                    <article class="card">
-                        <div class="card-head">
-                            <h2><i class="fa-solid fa-wind"></i> Wind Gust <span class="muted small">(km/h)</span></h2>
-                        </div>
-                        <div class="chart-wrap"><canvas id="windChart"></canvas></div>
-                    </article>
-                </div>
-
-                <div class="grid-two">
-                    <article class="card">
-                        <div class="card-head">
-                            <h2><i class="fa-solid fa-droplet"></i> Humidity Forecast</h2>
-                        </div>
-                        <div class="chart-wrap"><canvas id="humidityChart"></canvas></div>
-                    </article>
-                    <article class="card">
-                        <div class="card-head">
-                            <h2><i class="fa-solid fa-sun"></i> UV Index <span class="muted small">(Next 7 Days)</span>
-                            </h2>
-                        </div>
-                        <div class="uv-grid" id="uvGrid"></div>
-                    </article>
-                </div>
-
-                <article class="card">
-                    <div class="card-head">
-                        <h2>7-Day Forecast Details</h2>
-                    </div>
-                    <ul class="daily-list" id="dailyListFull"></ul>
-                </article>
-
-                <div class="quick-grid">
-                    <div class="quick-card">
-                        <small>Sunrise & Sunset</small>
-                        <div class="quick-sun-row"><i class="fa-solid fa-sun"></i><strong
-                                id="sunriseTimeMini">--:--</strong></div>
-                        <div class="quick-sun-row"><i class="fa-solid fa-sun"></i><strong
-                                id="sunsetTimeMini">--:--</strong></div>
-                    </div>
-                    <div class="quick-card">
-                        <small>Moon Phase</small>
-                        <i class="fa-solid fa-moon"></i>
-                        <strong id="moonPhaseNameMini">--</strong>
-                    </div>
-                    <button class="quick-card as-button" data-view="airquality">
-                        <small>Air Quality</small>
-                        <strong id="quickAqiValue">--</strong>
-                        <span id="quickAqiLabel" class="muted">--</span>
-                    </button>
-                    <div class="quick-card">
-                        <small>Pressure</small>
-                        <i class="fa-solid fa-gauge-high"></i>
-                        <strong id="quickPressure">-- hPa</strong>
-                    </div>
-                    <div class="quick-card">
-                        <small>Visibility</small>
-                        <i class="fa-solid fa-eye"></i>
-                        <strong id="quickVisibility">-- km</strong>
-                    </div>
-                    <div class="quick-card">
-                        <small>Pollen Count</small>
-                        <i class="fa-solid fa-seedling"></i>
-                        <strong>N/A</strong>
-                        <span class="muted">Not available yet</span>
-                    </div>
-                </div>
-            </section>
-
-            <section class="view" id="view-compare">
-                <article class="card">
-                    <div class="card-head">
-                        <h2><i class="fa-solid fa-scale-balanced"></i> Compare Cities</h2>
-                    </div>
-                    <div class="compare-grid">
-                        <div class="compare-col">
-                            <label class="search-box small"><i class="fa-solid fa-magnifying-glass"></i><input
-                                    type="text" id="compareCityA" placeholder="City A…"></label>
-                            <div class="compare-card" id="compareCardA">
-                                <p class="muted">Search a city to compare.</p>
-                            </div>
-                        </div>
-                        <div class="compare-vs"><i class="fa-solid fa-bolt"></i></div>
-                        <div class="compare-col">
-                            <label class="search-box small"><i class="fa-solid fa-magnifying-glass"></i><input
-                                    type="text" id="compareCityB" placeholder="City B…"></label>
-                            <div class="compare-card" id="compareCardB">
-                                <p class="muted">Search a city to compare.</p>
+                            <div class="compare-vs"><i class="fa-solid fa-code-compare"></i></div>
+                            <div>
+                                <div class="city-row"><i class="fa-solid fa-location-dot"></i><span class="city-row-name">Mumbai</span></div>
+                                <div class="compare-card">
+                                    <div class="compare-stat"><span>Temp</span><span class="worse">28°C</span></div>
+                                    <div class="compare-stat"><span>Humidity</span><span class="better">72%</span></div>
+                                    <div class="compare-stat"><span>Wind</span><span class="worse">9 km/h</span></div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </article>
-            </section>
+                </div>
+            </div>
+        </section>
 
-            <section class="view" id="view-favourites">
-                <article class="card">
-                    <div class="card-head">
-                        <h2><i class="fa-solid fa-heart"></i> Favourites</h2><span class="muted small">Up to 5
-                            cities</span>
-                    </div>
-                    <ul class="city-list" id="favouritesList">
-                        <li class="empty-row muted">No favourites yet — tap the star on a city to save it.</li>
-                    </ul>
-                </article>
-            </section>
-
-            <section class="view" id="view-recent">
-                <article class="card">
-                    <div class="card-head">
-                        <h2><i class="fa-solid fa-clock-rotate-left"></i> Recent Searches</h2><span
-                            class="muted small">Last 7</span>
-                    </div>
-                    <ul class="city-list" id="recentList">
-                        <li class="empty-row muted">No recent searches yet.</li>
-                    </ul>
-                </article>
-            </section>
-
-            <section class="view" id="view-settings">
-                <article class="card">
-                    <div class="card-head">
-                        <h2><i class="fa-solid fa-gear"></i> Settings</h2>
-                    </div>
-                    <div class="settings-row">
-                        <div><strong>Temperature Unit</strong>
-                            <p class="muted">Choose Celsius or Fahrenheit.</p>
-                        </div>
-                        <div class="seg-toggle" id="unitToggleSettings">
-                            <button class="seg-btn active" data-unit="C">°C</button>
-                            <button class="seg-btn" data-unit="F">°F</button>
+        <section class="lp-section" id="screenshots">
+            <div class="lp-section-head">
+                <span class="lp-eyebrow">App Screenshots</span>
+                <h2>See Vayu in action</h2>
+                <p>A glimpse of the dashboard, air quality panel and astronomy view, all wrapped in the same glass-clean design.</p>
+            </div>
+            <div class="lp-phone-row">
+                <div class="lp-phone-item">
+                    <div class="lp-phone">
+                        <div class="lp-phone-notch"></div>
+                        <div class="lp-phone-screen">
+                            <div class="lp-mini-topbar"><span class="lp-mini-dot"></span><div class="lp-mini-line w40"></div></div>
+                            <div class="lp-mini-card">
+                                <div class="lp-mini-big">29°C</div>
+                                <div class="lp-mini-line w60"></div>
+                                <div class="lp-mini-line w40"></div>
+                            </div>
+                            <div class="lp-mini-row">
+                                <div class="lp-mini-chip"></div>
+                                <div class="lp-mini-chip"></div>
+                                <div class="lp-mini-chip"></div>
+                            </div>
+                            <div class="lp-mini-card">
+                                <div class="lp-mini-line w80"></div>
+                                <div class="lp-mini-line w60"></div>
+                            </div>
                         </div>
                     </div>
-                    <div class="settings-row">
-                        <div><strong>Theme</strong>
-                            <p class="muted">Switch between light and dark mode.</p>
+                    <strong>Dashboard</strong>
+                </div>
+                <div class="lp-phone-item">
+                    <div class="lp-phone">
+                        <div class="lp-phone-notch"></div>
+                        <div class="lp-phone-screen">
+                            <div class="lp-mini-topbar"><span class="lp-mini-dot"></span><div class="lp-mini-line w40"></div></div>
+                            <div class="lp-mini-card">
+                                <div class="lp-mini-ring"><span>42</span></div>
+                                <div class="lp-mini-line w60" style="align-self:center;"></div>
+                            </div>
+                            <div class="lp-mini-row">
+                                <div class="lp-mini-chip"></div>
+                                <div class="lp-mini-chip"></div>
+                                <div class="lp-mini-chip"></div>
+                            </div>
                         </div>
-                        <button class="switch theme-switch" id="themeSwitchSettings" role="switch" aria-checked="true"
-                            aria-label="Toggle dark mode"><span class="switch-thumb"></span></button>
                     </div>
-                    <div class="settings-row">
-                        <div><strong>Notifications</strong>
-                            <p class="muted">Weather updates and severe alerts.</p>
+                    <strong>Air Quality</strong>
+                </div>
+                <div class="lp-phone-item">
+                    <div class="lp-phone">
+                        <div class="lp-phone-notch"></div>
+                        <div class="lp-phone-screen">
+                            <div class="lp-mini-topbar"><span class="lp-mini-dot"></span><div class="lp-mini-line w40"></div></div>
+                            <div class="lp-mini-card">
+                                <div class="lp-mini-line w80"></div>
+                                <div class="lp-mini-line w40"></div>
+                            </div>
+                            <div class="lp-mini-row">
+                                <div class="lp-mini-chip"></div>
+                                <div class="lp-mini-chip"></div>
+                            </div>
+                            <div class="lp-mini-card">
+                                <div class="lp-mini-line w60"></div>
+                                <div class="lp-mini-line w60"></div>
+                            </div>
                         </div>
-                        <button class="switch" id="notifSwitch" role="switch" aria-checked="false"
-                            aria-label="Toggle notifications"><span class="switch-thumb"></span></button>
                     </div>
-                    <div class="settings-row">
-                        <div><strong>Install App</strong>
-                            <p class="muted">Add Vayu to your home screen for offline access.</p>
-                        </div>
-                        <button class="btn-outline" id="installBtn" disabled>Install</button>
-                    </div>
-                </article>
-            </section>
+                    <strong>Astronomy</strong>
+                </div>
+            </div>
+        </section>
 
-        </main>
-    </div>
+        <section class="lp-section" id="download">
+            <div class="card lp-cta">
+                <h2>Take Vayu with you</h2>
+                <p>Install it once and open a full weather dashboard from your home screen, with an offline-ready shell.</p>
+                <div class="lp-cta-actions">
+                    <a class="btn-solid" href="home.html">Open Dashboard <i class="fa-solid fa-arrow-right"></i></a>
+                    <button class="btn-outline" id="installBtnCta" hidden><i class="fa-solid fa-download"></i> Install App</button>
+                </div>
+            </div>
+        </section>
+    </main>
 
-    <nav class="bottom-nav only-mobile" aria-label="Primary">
-        <button class="bn-btn active" data-view="dashboard"><i
-                class="fa-solid fa-house"></i><span>Dashboard</span></button>
-        <button class="bn-btn" data-view="forecast"><i
-                class="fa-solid fa-cloud-sun-rain"></i><span>Forecast</span></button>
-        <button class="bn-btn" data-view="airquality"><i class="fa-solid fa-wind"></i><span>Air Quality</span></button>
-        <button class="bn-btn" data-view="astronomy"><i class="fa-solid fa-moon"></i><span>Astronomy</span></button>
-        <button class="bn-btn" id="moreBtn"><i class="fa-solid fa-grip"></i><span>More</span></button>
-    </nav>
-    <div class="sheet-overlay" id="sheetOverlay"></div>
-    <div class="sheet" id="moreSheet">
-        <div class="sheet-handle"></div>
-        <ul class="nav-list">
-            <li><button class="nav-link" data-view="compare"><i class="fa-solid fa-scale-balanced"></i><span>Compare
-                        Cities</span></button></li>
-            <li><button class="nav-link" data-view="favourites"><i
-                        class="fa-solid fa-heart"></i><span>Favourites</span></button></li>
-            <li><button class="nav-link" data-view="recent"><i class="fa-solid fa-clock-rotate-left"></i><span>Recent
-                        Searches</span></button></li>
-            <li><button class="nav-link" data-view="settings"><i
-                        class="fa-solid fa-gear"></i><span>Settings</span></button></li>
-        </ul>
-    </div>
-
-    <div class="toast" id="toast"></div>
-    <script src="config.js"></script>
-    <script src="script.js"></script>
-    <script src="charts.js"></script>
+    <footer class="app-footer">Developed by <strong>Mayank Prashar</strong></footer>
+    <script src="landing.js"></script>
 </body>
 
 </html>
